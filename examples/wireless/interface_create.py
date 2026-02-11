@@ -1,13 +1,14 @@
 import pprint
 from examples.config import connection
 
-from ponika.endpoints.wireless.interfaces import WirelessInterfaceDefinition
+from ponika.endpoints.wireless.interfaces import WirelessInterfaceCreatePayload
 
-newInterface = WirelessInterfaceDefinition(
-    key="Wifi-Key", 
-    ssid="Example-SSID"
-)
+newInterface = WirelessInterfaceCreatePayload()
+newInterface.ssid = "Example-SSID"
+newInterface.key = "Wifi-Key"
+
 response = connection.wireless.interfaces.create(newInterface)
 
 print(type(response))
 pprint.pprint(response)
+

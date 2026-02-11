@@ -1,5 +1,5 @@
 from examples.config import connection
 
-response = connection.wireless.interfaces.get_config(1)
+response = connection.wireless.devices.get_config()
 
 print(response)

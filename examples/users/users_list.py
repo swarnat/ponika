@@ -1,6 +1,7 @@
 from examples.config import connection
 
-response = connection.wireless.interfaces.delete(1)
+
+response = connection.users.get_config()
 
 print(type(response))
 print(response)

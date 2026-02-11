@@ -1,8 +1,9 @@
 import datetime
+from ponika.endpoints import Endpoint
 from pydantic import BaseModel, validate_call
 
 from ponika.exceptions import TeltonikaApiException
-from ponika.models import ApiResponse, Endpoint
+from ponika.models import ApiResponse
 
 class FirmwareDeviceStatusResponse(BaseModel):
     kernel_version: str

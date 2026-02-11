@@ -1,8 +1,7 @@
 from typing import TYPE_CHECKING
+from ponika.endpoints import Endpoint
 from ponika.endpoints.firmware.device import FirmwareDeviceEndpoint
 from ponika.endpoints.wireless.interfaces import InterfacesEndpoint
-from ponika.endpoints.wireless.interfaces import WirelessInterfaceDefinition
-from ponika.models import Endpoint
 
 if TYPE_CHECKING:
     from ponika import PonikaClient

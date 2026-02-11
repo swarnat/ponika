@@ -1,25 +1,14 @@
-from dataclasses import dataclass, field
-from ponika.exceptions import TeltonikaApiException
-from pydantic import BaseModel, Field
+from ponika.endpoints import CRUDEndpoint, StatusEndpoint
+from pydantic import Field
 from typing import TYPE_CHECKING, List, Optional
 
-from ponika.models import ApiResponse, BasePayload
+from ponika.models import BaseModel, BasePayload
 
 from ponika.endpoints.wireless.enums import Encryption, Cipher, WifiMode
 
 if TYPE_CHECKING:
     from ponika import PonikaClient
-
-@dataclass
-class WirelessInterfaceDefinition(BasePayload):
-    id: Optional[str] = None
-    key_set: Optional[str] = None
-    auth_secret_set: Optional[str] = None
-    acct_secret_set: Optional[str] = None
-    password_set: Optional[str] = None
-    pkcs_passwd_set: Optional[str] = None
-    priv_key_pwd_set: Optional[str] = None
-    priv_key2_pwd_set: Optional[str] = None
+class WirelessInterfaceBase:
 
     encryption: Encryption | str = Encryption.PSK2
     key: Optional[str] = None
@@ -67,7 +56,7 @@ class WirelessInterfaceDefinition(BasePayload):
     anonymous_identity: Optional[str] = None
     password: Optional[str] = None
     macfilter: Optional[str] = None
-    maclist: List[str] = field(default_factory=list)
+    maclist: List[str] = Field(default_factory=list)
     delete_from_whitelist: Optional[str] = None
     short_preamble: Optional[str] = None
     dtim_period: Optional[str] = None
@@ -82,35 +71,18 @@ class WirelessInterfaceDefinition(BasePayload):
     scan_time: Optional[str] = None
     auto_reconnect: Optional[str] = None
 
-    def asdict(self) -> dict:
-        data = super().asdict()
-        aliases = {
-            "key_set": "key:set",
-            "auth_secret_set": "auth_secret:set",
-            "acct_secret_set": "acct_secret:set",
-            "password_set": "password:set",
-            "pkcs_passwd_set": "pkcs_passwd:set",
-            "priv_key_pwd_set": "priv_key_pwd:set",
-            "priv_key2_pwd_set": "priv_key2_pwd:set",
-        }
-        for source, target in aliases.items():
-            data[target] = data.pop(source)
+class WirelessInterfaceConfigResponse(BaseModel, WirelessInterfaceBase): 
+    key_set: Optional[str] = Field(serialization_alias='key:set', exclude=True, default=None)
+    auth_secret_set: Optional[str] = Field(serialization_alias='auth_secret:set', exclude=True, default=None)
+    acct_secret_set: Optional[str] = Field(serialization_alias='acct_secret:set', exclude=True, default=None)
+    password_set: Optional[str] = Field(serialization_alias='password:set', exclude=True, default=None)
+    pkcs_passwd_set: Optional[str] = Field(serialization_alias='pkcs_passwd:set', exclude=True, default=None)
+    priv_key_pwd_set: Optional[str] = Field(serialization_alias='priv_key_pwd:set', exclude=True, default=None)
+    priv_key2_pwd_set: Optional[str] = Field(serialization_alias='priv_key2_pwd:set', exclude=True, default=None)
 
-        return {k: v for k, v in data.items() if v is not None}
-
-class WirelessInterfacesConfigResponse(BaseModel):
-    id: str
-    wifi_id: str
-    network: str
-    key: str
-    ssid: str
-    mode: WifiMode
-    short_preamble: bool
-    isolate: bool
-    disassoc_low_ack: bool
-    cipher: Cipher = Cipher.AUTO
-    enabled: bool = True
-    encryption: Encryption = Encryption.PSK2
+class WirelessInterfaceCreatePayload(BasePayload, WirelessInterfaceBase): ...
+class WirelessInterfaceUpdatePayload(BasePayload, WirelessInterfaceBase):
+    id: int
 
 class WirelessInterfacesDeleteResponse(BaseModel):
     # deleted interface
@@ -151,84 +123,16 @@ class WirelessInterfacesStatusResponse(BaseModel):
     # auth_status: int
 
 
-class InterfacesEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+class InterfacesEndpoint(
+    CRUDEndpoint[WirelessInterfaceCreatePayload, WirelessInterfaceConfigResponse, WirelessInterfaceUpdatePayload, WirelessInterfacesDeleteResponse],
+    StatusEndpoint[WirelessInterfacesStatusResponse]
+):
+    endpoint_path = "/wireless/interfaces/config"
+    status_endpoint_path = "/wireless/interfaces/status"
 
-    def get_status(self, interface_id: int | str = None) -> List[WirelessInterfacesStatusResponse]:
-        """Fetch wireless interfaces status from the device."""
+    config_response_model =  WirelessInterfaceConfigResponse
+    create_modele_model = WirelessInterfaceCreatePayload
+    update_model = WirelessInterfaceUpdatePayload
 
-        if interface_id:
-            response = ApiResponse[WirelessInterfacesStatusResponse].model_validate(
-                self._client._get(f"/wireless/interfaces/status/{interface_id}")
-            )
-        else:
-            response = ApiResponse[list[WirelessInterfacesStatusResponse]].model_validate(
-                self._client._get("/wireless/interfaces/status")
-            )
-
-        if not response.success:
-            raise TeltonikaApiException(response.errors)
-
-        return response.data        
-
-    
-    def get_config(
-        self,
-        interface_id=None,
-    ) -> List[WirelessInterfaceDefinition] | WirelessInterfaceDefinition:
-        """Fetch wireless interfaces status from the device."""
-        if interface_id:
-            response = ApiResponse[WirelessInterfaceDefinition].model_validate(
-                self._client._get(f"/wireless/interfaces/config/{interface_id}")
-            )
-        else:
-            response = ApiResponse[list[WirelessInterfaceDefinition]].model_validate(
-                self._client._get("/wireless/interfaces/config")
-            )
-
-        if not response.success:
-            raise TeltonikaApiException(response.errors)
-
-        return response.data        
-
-
-    def delete(self, interface_id) -> WirelessInterfacesDeleteResponse:
-        response = self._client._delete(
-            endpoint=f"/wireless/interfaces/config/{interface_id}",
-            data_model=WirelessInterfacesDeleteResponse,
-        )
-
-        if not response.success:
-            raise TeltonikaApiException(response.errors)
-
-        return response.data        
-    
-    def create(self, interface: WirelessInterfaceDefinition) -> WirelessInterfacesConfigResponse:
-        response = self._client._post_data(
-            endpoint="/wireless/interfaces/config",
-            params=interface,
-            data_model=WirelessInterfacesConfigResponse,
-        )
-
-        if not response.success:
-            raise TeltonikaApiException(response.errors)
-
-        return response.data
-        
-    
-    def update(self, interface: WirelessInterfaceDefinition) -> WirelessInterfacesConfigResponse:
-        interface_id = interface.id
-        del interface.id
-
-        response = self._client._put_data(
-            endpoint=f"/wireless/interfaces/config/{interface_id}",
-            params=interface,
-            data_model=WirelessInterfacesConfigResponse,
-        )
-    
-        if not response.success:
-            raise TeltonikaApiException(response.errors)
-
-        return response.data    
-        
+    delete_reponse_model = WirelessInterfacesDeleteResponse
+    status_response_model = WirelessInterfacesStatusResponse

@@ -1,6 +1,5 @@
 from enum import Enum
 
-
 class Encryption(str, Enum):
     NONE = "none"                 # No encryption
     PSK = "psk"                   # WPA-PSK
@@ -25,3 +24,7 @@ class WifiMode(str, Enum):
     CLIENT = "sta"     
     MESH = "mesh" 
     MULTI_ACCESSPOINT = "multi_ap"  
+
+class WifiDeviceBand(str, Enum):
+    GHZ_2_4 = "2.4GHz"
+    GHZ_5 = "5GHz"

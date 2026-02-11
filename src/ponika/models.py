@@ -1,15 +1,35 @@
 from dataclasses import asdict, dataclass
 from enum import Enum
-from typing import TYPE_CHECKING, Generic, List, Optional, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, List, Optional, Type, TypeVar
 
 if TYPE_CHECKING:
     from ponika import PonikaClient
 
-from pydantic import BaseModel
+from pydantic import BaseModel as PydanticBaseModel, ConfigDict
 
 
 T = TypeVar("T")
 
+class BasePayload(PydanticBaseModel):
+    def asdict(self) -> dict[str, Any]:
+        
+        def convert(value: Any) -> Any:
+            if isinstance(value, Enum):
+                return value.value
+            if isinstance(value, list):
+                return [convert(v) for v in value]
+            if isinstance(value, bool):
+                return "1" if value is True else "0"
+            if isinstance(value, dict):
+                return {k: convert(v) for k, v in value.items()}
+            
+            return value
+
+        response = self.model_dump(exclude_none=True, by_alias=True)
+        return convert(response)
+    
+class BaseModel(PydanticBaseModel):
+    model_config = ConfigDict(frozen=True)
 
     
 class TeltonikaApiError(BaseModel):
@@ -24,32 +44,17 @@ class TeltonikaApiError(BaseModel):
         return f"Error {self.code}: {self.error} ({self.source}, {self.section})"
 
 
-class Endpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client    
 
+
+
+
+        
 class ApiResponse(BaseModel, Generic[T]):
     success: bool
     data: None | T = None
     errors: Optional[List[TeltonikaApiError]] = None
 
-@dataclass
-class BasePayload:
-    def asdict(self) -> dict:
-        def convert(value):
-            if isinstance(value, Enum):
-                return value.value
-            if isinstance(value, list):
-                return [convert(v) for v in value]
-            if isinstance(value, bool):
-                return "1" if value == True else "0"
-            if isinstance(value, dict):
-                return {k: convert(v) for k, v in value.items()}
-            
-            return value
-
-        return convert(asdict(self))    
-    
+   
 class Token(BaseModel):
     """Data model for token storage."""
 

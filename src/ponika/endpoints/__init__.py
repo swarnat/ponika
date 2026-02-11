@@ -1,0 +1,154 @@
+
+from dataclasses import fields
+from typing import Generic, List, Type, TypeVar, overload
+
+from pydantic import ValidationError
+
+from ponika.exceptions import TeltonikaApiException
+from ponika.models import ApiResponse, BaseModel, BasePayload
+
+
+TItemCreatePayload = TypeVar("TItemCreatePayload", bound=BasePayload)
+TItemUpdatePayload = TypeVar("TItemUpdatePayload", bound=BasePayload)
+
+TConfigResponse = TypeVar("TConfigResponse", bound=BaseModel)
+TDeleteResponse = TypeVar("TDeleteResponse", bound=BaseModel)
+TStatusResponseModel = TypeVar("TStatusResponseModel", bound=BaseModel)
+
+
+class Endpoint:
+    def __init__(self, client: "PonikaClient") -> None:
+        self._client: "PonikaClient" = client
+
+
+class StatusEndpoint(Generic[TStatusResponseModel]):
+    status_response_model = Type[TStatusResponseModel]
+    allow_status_without_id: bool = True
+    allow_status_with_id: bool = True
+
+    @overload
+    def get_status(self, item_id: int | str) -> TStatusResponseModel:
+        ...
+
+    @overload
+    def get_status(self) -> List[TStatusResponseModel]:
+        ...
+            
+    def get_status(self, item_id: int | str | None = None) -> List[TStatusResponseModel] | TStatusResponseModel:
+        """Fetch wireless interfaces status from the device."""
+        if item_id is None and not self.allow_status_without_id:
+            raise ValueError(
+                f"{self.__class__.__name__}.get_status() without item_id is not available for this endpoint."
+            )
+
+        if item_id is not None and not self.allow_status_with_id:
+            raise ValueError(
+                f"{self.__class__.__name__}.get_status(item_id=...) is not available for this endpoint."
+            )
+
+        endpoint = f"{self.status_endpoint_path}/{item_id}" if item_id else f"{self.status_endpoint_path}"
+        ResultType = self.status_response_model if item_id else List[self.status_response_model]
+
+        response = self._client._get(endpoint)
+        try:
+            response_obj = ApiResponse[ResultType].model_validate(
+                response
+            )
+        except ValidationError as e:
+            print(f"Error during request: GET {endpoint}")
+            print(f"Error during response validation to class ApiResponse[{ResultType}]")
+            print(f"Response we got: {response}")
+            raise e
+
+        if not response_obj.success:
+            raise TeltonikaApiException(response_obj.errors)
+
+        return response_obj.data        
+class DeleteEndpoint(Generic[TDeleteResponse]):
+    delete_reponse_model = Type[TDeleteResponse]
+
+    def delete(self, item_id: str | int) -> TDeleteResponse:
+        response = self._client._delete(
+            endpoint=f"{self.endpoint_path}/{item_id}",
+            data_model=self.delete_reponse_model,
+        )
+        if not response.success:
+            raise TeltonikaApiException(response.errors)
+        
+        return response.data
+class CreateEndpoint(Generic[TItemCreatePayload, TConfigResponse]):
+    config_response_model = Type[TConfigResponse]
+
+    def create(self, payload: TItemCreatePayload) -> TConfigResponse:
+        response = self._client._post_data(
+            endpoint=self.endpoint_path,
+            params=payload,
+            data_model=self.config_response_model,
+        )
+        if not response.success:
+            raise TeltonikaApiException(response.errors)
+        return response.data
+class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
+    config_response_model = Type[TConfigResponse]
+    update_model: Type[TItemUpdatePayload]
+
+    def update(self, payload: TItemUpdatePayload) -> TConfigResponse:
+        item_id = payload.id
+        del payload.id
+
+        response = self._client._put_data(
+            endpoint=f"{self.endpoint_path}/{item_id}",
+            params=payload,
+            data_model=self.config_response_model,
+        )
+        if not response.success:
+            raise TeltonikaApiException(response.errors)
+        return response.data
+ 
+    def config_to_update_payload(self, payload: TConfigResponse):
+        return self.update_model(**payload.model_dump(mode="python"))
+
+        # target_fields = self.update_model.model_fields.keys()
+        # target_fields = [field.name for field in fields(self.update_model)]
+
+        # data = payload.model_dump(include=target_fields)
+        # return self.update_model(**data)
+class ReadEndpoint(Generic[TConfigResponse]):
+    config_response_model = Type[TConfigResponse]
+
+    @overload
+    def get_config(self, item_id: int | str) -> TConfigResponse:
+        ...
+
+    @overload
+    def get_config(self) -> List[TConfigResponse]:
+        ...
+
+    def get_config(
+        self,
+        item_id: str | int | None =None,
+    ) -> List[TConfigResponse] | TConfigResponse:
+        endpoint = f"{self.endpoint_path}/{item_id}" if item_id else self.endpoint_path
+
+        response_model = ApiResponse[self.config_response_model] if item_id else ApiResponse[list[self.config_response_model]]
+        
+        response = self._client._get(endpoint)
+
+        response = response_model.model_validate(response)
+        
+        if not response.success:
+            raise TeltonikaApiException(response.errors)
+        return response.data
+
+
+class CRUDEndpoint(
+    Endpoint,
+
+    CreateEndpoint[TItemCreatePayload, TConfigResponse],
+    ReadEndpoint[TConfigResponse],
+    UpdateEndpoint[TItemUpdatePayload, TConfigResponse],
+    DeleteEndpoint[TDeleteResponse],
+
+    Generic[TItemCreatePayload, TConfigResponse, TItemUpdatePayload, TDeleteResponse]
+):
+    endpoint_path: str

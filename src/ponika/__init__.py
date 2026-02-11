@@ -1,15 +1,18 @@
 from contextlib import ExitStack
 from dataclasses import asdict
 import os
+import urllib3
 
 from typing import Type, Optional, Dict, Any
 from requests import Session
 from logging import Logger, getLogger
 from ponika.endpoints.firmware import FirmwareEndpoint
-from pydantic import BaseModel, validate_call
+from ponika.endpoints.users import UsersEndpoint
+from ponika.exceptions import TeltonikaApiException
+from pydantic import validate_call
 from time import time
 
-from ponika.endpoints.dhcp import DhcpEndpoint
+from ponika.endpoints.dhcp import DHCPEndpoint
 from ponika.endpoints.gps import GpsEndpoint
 from ponika.endpoints.internet_connection import InternetConnectionEndpoint
 from ponika.endpoints.ip_neighbors import IpNeighborsEndpoint
@@ -20,7 +23,9 @@ from ponika.endpoints.session import SessionEndpoint
 from ponika.endpoints.tailscale import TailscaleEndpoint
 from ponika.endpoints.unauthorized import UnauthorizedEndpoint
 from ponika.endpoints.wireless import WirelessEndpoint
-from ponika.models import T, ApiResponse, BasePayload, Token
+from ponika.models import T, ApiResponse, BasePayload, Token, BaseModel
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class ClientConfig(BaseModel):
     """Configuration for PonikaClient."""
@@ -71,7 +76,7 @@ class PonikaClient:
         self.session = SessionEndpoint(self)
         self.messages = MessagesEndpoint(self)
         self.gps = GpsEndpoint(self)
-        self.dhcp = DhcpEndpoint(self)
+        self.dhcp = DHCPEndpoint(self)
         self.tailscale = TailscaleEndpoint(self)
         self.wireless = WirelessEndpoint(self)
         self.internet_connection = InternetConnectionEndpoint(self)
@@ -79,6 +84,7 @@ class PonikaClient:
         self.ip_neighbors = IpNeighborsEndpoint(self)
         self.modems = ModemsEndpoint(self)
         self.firmware = FirmwareEndpoint(self)
+        self.users = UsersEndpoint(self)
 
     def _get_auth_token(self) -> Optional[str]:
         """Get the current authentication token."""
@@ -114,7 +120,7 @@ class PonikaClient:
             params=params,
             headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
         )
-        print(response.text)
+
         return response.json()
 
     def _post_data(
@@ -125,7 +131,7 @@ class PonikaClient:
         auth_required: bool = True,
     ) -> ApiResponse[T]:
 
-        if isinstance(params, BasePayload):
+        if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         return self._post(endpoint=endpoint, data_model=data_model, params={"data":params}, auth_required=auth_required)
@@ -139,7 +145,7 @@ class PonikaClient:
     ) -> ApiResponse[T]:
         self._logger.info("Making POST request to: %s", endpoint)
 
-        if isinstance(params, BasePayload):
+        if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         auth_token = self._get_auth_token() if auth_required else None
@@ -150,7 +156,7 @@ class PonikaClient:
             json=params,
             headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
         )
-            
+
         return ApiResponse[data_model].model_validate(response.json())
     
     def _post_files(
@@ -163,7 +169,7 @@ class PonikaClient:
     ) -> ApiResponse[T]:
         self._logger.info("Making POST request to: %s", endpoint)
 
-        if isinstance(params, BasePayload):
+        if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         auth_token = self._get_auth_token() if auth_required else None
@@ -205,7 +211,7 @@ class PonikaClient:
         auth_required: bool = True,
     ) -> ApiResponse[T]:
 
-        if isinstance(params, BasePayload):
+        if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         return self._put(endpoint=endpoint, data_model=data_model, params={"data":params}, auth_required=auth_required)
@@ -219,7 +225,7 @@ class PonikaClient:
     ) -> ApiResponse[T]:
         self._logger.info("Making POST request to: %s", endpoint)
 
-        if isinstance(params, BasePayload):
+        if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         auth_token = self._get_auth_token() if auth_required else None
@@ -231,7 +237,12 @@ class PonikaClient:
             headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
         )
 
-        return ApiResponse[data_model].model_validate(response.json())
+        try:
+            response_json = response.json()
+        except TypeError:
+            raise TeltonikaApiException(f"Cannot JSON decode response: {response.text}")
+
+        return ApiResponse[data_model].model_validate(response_json)
     
     def _delete(
         self,

@@ -6,6 +6,7 @@ import urllib3
 from typing import Type, Optional, Dict, Any
 from requests import Session
 from logging import Logger, getLogger
+from ponika.endpoints.data_usage import DataUsageEndpoint
 from ponika.endpoints.firmware import FirmwareEndpoint
 from ponika.endpoints.users import UsersEndpoint
 from ponika.exceptions import TeltonikaApiException
@@ -85,6 +86,7 @@ class PonikaClient:
         self.modems = ModemsEndpoint(self)
         self.firmware = FirmwareEndpoint(self)
         self.users = UsersEndpoint(self)
+        self.data_usage = DataUsageEndpoint(self)
 
     def _get_auth_token(self) -> Optional[str]:
         """Get the current authentication token."""

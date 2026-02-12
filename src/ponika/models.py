@@ -37,7 +37,7 @@ class TeltonikaApiError(BaseModel):
 
     code: int
     error: str
-    source: str
+    source: str | int
     section: Optional[str] = None
 
     def __str__(self) -> str:

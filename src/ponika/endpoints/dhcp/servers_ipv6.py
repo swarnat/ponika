@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from ponika import PonikaClient
 
 class DhcpIpv6ServerBase:
-    interface: str | None = None
     enable_dhcpv6: str | None = None
     ra: WifiMode | None = None
     dhcpv6: WifiMode | None = None
@@ -28,10 +27,12 @@ class DhcpIpv6ServerBase:
 
 class DhcpIpv6ServerConfigResponse(BaseModel, DhcpIpv6ServerBase):
     id: str
+    interface: str | None = None
 
 
 class DhcpIpv6ServerCreatePayload(BasePayload, DhcpIpv6ServerBase): 
     id: str
+    interface: str | None = None
 
 
 class DhcpIpv6ServerUpdatePayload(BasePayload, DhcpIpv6ServerBase):

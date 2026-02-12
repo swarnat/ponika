@@ -1,4 +1,4 @@
-from ponika.endpoints import CRUDEndpoint, CreateEndpoint, Endpoint, ReadEndpoint, StatusEndpoint, UpdateEndpoint
+from ponika.endpoints import CreateEndpoint, Endpoint, ReadEndpoint, StatusEndpoint, UpdateEndpoint
 from pydantic import Field
 from typing import TYPE_CHECKING, List, Optional
 
@@ -12,7 +12,6 @@ if TYPE_CHECKING:
     from ponika import PonikaClient
 
 class DhcpIpv4ServerBase:
-    interface: str | None = None
     enable_dhcpv4: str | None = None
     mode: DHCPMode | None = None
     server_relay: str | None = None
@@ -29,11 +28,12 @@ class DhcpIpv4ServerBase:
 
 class DhcpIpv4ServerConfigResponse(BaseModel, DhcpIpv4ServerBase):
     id: str
+    interface: str | None = None
 
 
 class DhcpIpv4ServerCreatePayload(BasePayload, DhcpIpv4ServerBase): 
     id: str
-
+    interface: str | None = None
 
 class DhcpIpv4ServerUpdatePayload(BasePayload, DhcpIpv4ServerBase):
     id: str

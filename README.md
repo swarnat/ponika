@@ -2,6 +2,41 @@
 
 Ponika is a Python library for interacting with the Teltonika devices.
 
+## supported Endpoints
+
+| Modul | Endpoint | Status |
+| ----- | -------- | ------ |
+| Data Usages  | SIM Card | ✅ |
+| Data Usages  | Modem | ⭕ |
+| Data Usages  | eSIM | ❌ |
+| DHCP  | DHCP Server IPv4 | ✅ |
+| DHCP  | Static Leases IPv4 | ⭕ |
+| DHCP  | DHCP Server IPv6 | ✅ |
+| DHCP  | Static Leases IPv6 | ⭕ |
+| Firmware  | Upgrade | ✅ |
+| GPS |  | ✅ |
+| Internet Connection |  | ✅ |
+| IP Neightbors | IPv4 | ✅ |
+| IP Neightbors | IPv6 | ✅ |
+| IP Routes  | IPv4 Routes | ✅ |
+| IP Routes  | IPv6 Routes | ✅ |
+| Modem |  | 🟡 |
+| MQTT | Broker  | ⭕ |
+| MQTT | Publisher  | ⭕ |
+| OpenVPN |  | ⭕ |
+| SMS | Send | ✅ |
+| SMS | Read | ⭕ |
+| Tailscale |  | 🟡 |
+| Usermanagement  | - | ✅ |
+| Wireguard |  | ⭕ |
+| Wireless  | Devices | ✅ |
+| Wireless  | Interfaces | ✅ |
+| Zerotier |  | ⭕ |
+
+✅ - Supported  
+🟡 - Partially implemented
+⭕ - Will be implemented   
+❌ - Will not implemented at the moment (Several reasons)
 ## Installation
 
 You can install Ponika using pip:

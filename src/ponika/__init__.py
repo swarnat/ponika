@@ -9,14 +9,14 @@ from logging import Logger, getLogger
 from ponika.endpoints.firmware import FirmwareEndpoint
 from ponika.endpoints.users import UsersEndpoint
 from ponika.exceptions import TeltonikaApiException
-from pydantic import validate_call
+from pydantic import ValidationError, validate_call
 from time import time
 
 from ponika.endpoints.dhcp import DHCPEndpoint
 from ponika.endpoints.gps import GpsEndpoint
 from ponika.endpoints.internet_connection import InternetConnectionEndpoint
 from ponika.endpoints.ip_neighbors import IpNeighborsEndpoint
-from ponika.endpoints.ip_routes import IpRoutesEndpoint
+from ponika.endpoints.ip_routes import IPRouteEndpoint
 from ponika.endpoints.messages import MessagesEndpoint
 from ponika.endpoints.modems import ModemsEndpoint
 from ponika.endpoints.session import SessionEndpoint
@@ -80,7 +80,7 @@ class PonikaClient:
         self.tailscale = TailscaleEndpoint(self)
         self.wireless = WirelessEndpoint(self)
         self.internet_connection = InternetConnectionEndpoint(self)
-        self.ip_routes = IpRoutesEndpoint(self)
+        self.ip_routes = IPRouteEndpoint(self)
         self.ip_neighbors = IpNeighborsEndpoint(self)
         self.modems = ModemsEndpoint(self)
         self.firmware = FirmwareEndpoint(self)
@@ -262,7 +262,17 @@ class PonikaClient:
             headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
         )
 
-        return ApiResponse[data_model].model_validate(response.json())
+        try:
+            response_obj = ApiResponse[data_model].model_validate(
+                response.json()
+            )
+        except ValidationError as e:
+            print(f"Error during request: DELETE {endpoint}")
+            print(f"Error during response validation to class ApiResponse[{data_model}]")
+            print(f"Response we got: {response.text}")
+            raise e
+
+        return response_obj
 
     class LoginResponseData(BaseModel):
         """Data model for login response."""

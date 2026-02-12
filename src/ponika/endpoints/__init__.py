@@ -33,7 +33,7 @@ class StatusEndpoint(Generic[TStatusResponseModel]):
     @overload
     def get_status(self) -> List[TStatusResponseModel]:
         ...
-            
+
     def get_status(self, item_id: int | str | None = None) -> List[TStatusResponseModel] | TStatusResponseModel:
         """Fetch wireless interfaces status from the device."""
         if item_id is None and not self.allow_status_without_id:
@@ -56,14 +56,17 @@ class StatusEndpoint(Generic[TStatusResponseModel]):
             )
         except ValidationError as e:
             print(f"Error during request: GET {endpoint}")
-            print(f"Error during response validation to class ApiResponse[{ResultType}]")
+            print(
+                f"Error during response validation to class ApiResponse[{ResultType}]")
             print(f"Response we got: {response}")
             raise e
 
         if not response_obj.success:
             raise TeltonikaApiException(response_obj.errors)
 
-        return response_obj.data        
+        return response_obj.data
+
+
 class DeleteEndpoint(Generic[TDeleteResponse]):
     delete_reponse_model = Type[TDeleteResponse]
 
@@ -74,8 +77,10 @@ class DeleteEndpoint(Generic[TDeleteResponse]):
         )
         if not response.success:
             raise TeltonikaApiException(response.errors)
-        
+
         return response.data
+
+
 class CreateEndpoint(Generic[TItemCreatePayload, TConfigResponse]):
     config_response_model = Type[TConfigResponse]
 
@@ -88,6 +93,8 @@ class CreateEndpoint(Generic[TItemCreatePayload, TConfigResponse]):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         return response.data
+
+
 class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
     config_response_model = Type[TConfigResponse]
     update_model: Type[TItemUpdatePayload]
@@ -104,7 +111,7 @@ class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         return response.data
- 
+
     def config_to_update_payload(self, payload: TConfigResponse):
         return self.update_model(**payload.model_dump(mode="python"))
 
@@ -113,6 +120,8 @@ class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
 
         # data = payload.model_dump(include=target_fields)
         # return self.update_model(**data)
+
+
 class ReadEndpoint(Generic[TConfigResponse]):
     config_response_model = Type[TConfigResponse]
 
@@ -126,16 +135,16 @@ class ReadEndpoint(Generic[TConfigResponse]):
 
     def get_config(
         self,
-        item_id: str | int | None =None,
+        item_id: str | int | None = None,
     ) -> List[TConfigResponse] | TConfigResponse:
         endpoint = f"{self.endpoint_path}/{item_id}" if item_id else self.endpoint_path
 
         response_model = ApiResponse[self.config_response_model] if item_id else ApiResponse[list[self.config_response_model]]
-        
+
         response = self._client._get(endpoint)
 
         response = response_model.model_validate(response)
-        
+
         if not response.success:
             raise TeltonikaApiException(response.errors)
         return response.data
@@ -149,6 +158,7 @@ class CRUDEndpoint(
     UpdateEndpoint[TItemUpdatePayload, TConfigResponse],
     DeleteEndpoint[TDeleteResponse],
 
-    Generic[TItemCreatePayload, TConfigResponse, TItemUpdatePayload, TDeleteResponse]
+    Generic[TItemCreatePayload, TConfigResponse,
+            TItemUpdatePayload, TDeleteResponse]
 ):
     endpoint_path: str

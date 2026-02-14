@@ -1,11 +1,14 @@
 
 from dataclasses import fields
-from typing import Generic, List, Type, TypeVar, overload
+from typing import TYPE_CHECKING, Generic, List, Type, TypeVar, cast, overload
 
 from pydantic import ValidationError
 
 from ponika.exceptions import TeltonikaApiException
 from ponika.models import ApiResponse, BaseModel, BasePayload
+
+if TYPE_CHECKING:
+    from ponika import PonikaClient
 
 
 TItemCreatePayload = TypeVar("TItemCreatePayload", bound=BasePayload)
@@ -98,19 +101,69 @@ class CreateEndpoint(Generic[TItemCreatePayload, TConfigResponse]):
 class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
     config_response_model = Type[TConfigResponse]
     update_model: Type[TItemUpdatePayload]
+    allow_bulk_update: bool = False
+    bulk_update_strip_item_id: bool = True
+    bulk_endpoint_path: str | None = None
 
-    def update(self, payload: TItemUpdatePayload) -> TConfigResponse:
-        item_id = payload.id
-        del payload.id
-
+    def update_by_id(
+        self,
+        item_id: str | int,
+        payload: TItemUpdatePayload | dict,
+    ) -> TConfigResponse:
         response = self._client._put_data(
             endpoint=f"{self.endpoint_path}/{item_id}",
             params=payload,
             data_model=self.config_response_model,
         )
-        if not response.success:
+        if not response.success or response.data is None:
             raise TeltonikaApiException(response.errors)
         return response.data
+
+    def update(self, payload: TItemUpdatePayload) -> TConfigResponse:
+        item_id = getattr(payload, "id", None)
+        if item_id is None:
+            raise ValueError(
+                f"{self.__class__.__name__}.update() requires payload.id; "
+                "use update_by_id(item_id, payload) when id is not part "
+                "of payload."
+            )
+
+        item_data = payload.asdict()
+        item_data.pop("id", None)
+        return self.update_by_id(item_id=item_id, payload=item_data)
+
+    def update_bulk(
+        self,
+        payloads: List[TItemUpdatePayload],
+    ) -> List[TConfigResponse]:
+        if not self.allow_bulk_update:
+            raise ValueError(
+                f"{self.__class__.__name__}.update_bulk() is not available "
+                "for this endpoint."
+            )
+
+        data = []
+        for payload in payloads:
+            item_data = payload.asdict()
+            if self.bulk_update_strip_item_id:
+                item_data.pop("id", None)
+            data.append(item_data)
+
+        endpoint = self.bulk_endpoint_path or self.endpoint_path
+        response = self._client._put(
+            endpoint=endpoint,
+            data_model=object,
+            params={"data": data},
+        )
+
+        response_model = ApiResponse[List[self.config_response_model]]
+        response_obj = response_model.model_validate(
+            response.model_dump(mode="python")
+        )
+
+        if not response_obj.success or response_obj.data is None:
+            raise TeltonikaApiException(response_obj.errors)
+        return cast(List[TConfigResponse], response_obj.data)
 
     def config_to_update_payload(self, payload: TConfigResponse):
         return self.update_model(**payload.model_dump(mode="python"))
@@ -123,6 +176,8 @@ class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
 
 
 class ReadEndpoint(Generic[TConfigResponse]):
+    _client: "PonikaClient"
+    endpoint_path: str
     config_response_model = Type[TConfigResponse]
 
     @overload
@@ -137,9 +192,17 @@ class ReadEndpoint(Generic[TConfigResponse]):
         self,
         item_id: str | int | None = None,
     ) -> List[TConfigResponse] | TConfigResponse:
-        endpoint = f"{self.endpoint_path}/{item_id}" if item_id else self.endpoint_path
+        endpoint = (
+            f"{self.endpoint_path}/{item_id}"
+            if item_id
+            else self.endpoint_path
+        )
 
-        response_model = ApiResponse[self.config_response_model] if item_id else ApiResponse[list[self.config_response_model]]
+        response_model = (
+            ApiResponse[self.config_response_model]
+            if item_id
+            else ApiResponse[list[self.config_response_model]]
+        )
 
         response = self._client._get(endpoint)
 
@@ -147,7 +210,7 @@ class ReadEndpoint(Generic[TConfigResponse]):
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
-        return response.data
+        return cast(List[TConfigResponse] | TConfigResponse, response.data)
 
 
 class CRUDEndpoint(

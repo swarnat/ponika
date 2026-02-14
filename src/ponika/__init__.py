@@ -4,8 +4,9 @@ import os
 import urllib3
 
 from typing import Type, Optional, Dict, Any
-from requests import Session
+from requests import Response, Session
 from logging import Logger, getLogger
+from ponika.endpoints.backup import BackupEndpoint
 from ponika.endpoints.data_usage import DataUsageEndpoint
 from ponika.endpoints.firmware import FirmwareEndpoint
 from ponika.endpoints.users import UsersEndpoint
@@ -77,6 +78,7 @@ class PonikaClient:
         self.session = SessionEndpoint(self)
         self.messages = MessagesEndpoint(self)
         self.gps = GpsEndpoint(self)
+        self.backup = BackupEndpoint(self)
         self.dhcp = DHCPEndpoint(self)
         self.tailscale = TailscaleEndpoint(self)
         self.wireless = WirelessEndpoint(self)
@@ -162,7 +164,39 @@ class PonikaClient:
             headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
         )
 
-        return ApiResponse[data_model].model_validate(response.json())
+        try:
+            response_obj = ApiResponse[data_model].model_validate(
+                response.json()
+            )
+        except ValidationError as e:
+            print(f"Error during request: POST {endpoint}")
+            print(f"Error during response validation to class ApiResponse[{data_model}]")
+            print(f"Response we got: {response.text}")
+            raise e
+
+        return response_obj
+    
+    def _post_raw(
+        self,
+        endpoint: str,
+        params: Optional[Dict[str, Any] | BasePayload] = None,
+        auth_required: bool = True,
+    ) -> Response:
+        self._logger.info("Making POST request to: %s", endpoint)
+
+        if isinstance(params, (BasePayload, BaseModel)):
+            params = params.asdict()
+
+        auth_token = self._get_auth_token() if auth_required else None
+
+        response = self._request.post(
+            f"{self._config.base_url}{endpoint}",
+            verify=self._config.verify_tls,
+            json=params,
+            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+        )
+
+        return response
     
     def _post_files(
         self,

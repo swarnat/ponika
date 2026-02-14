@@ -9,7 +9,7 @@ from logging import Logger, getLogger
 from ponika.endpoints.data_usage import DataUsageEndpoint
 from ponika.endpoints.firmware import FirmwareEndpoint
 from ponika.endpoints.users import UsersEndpoint
-from ponika.exceptions import TeltonikaApiException
+from ponika.exceptions import TeltonikaApiException, TeltonikaLoginException
 from pydantic import ValidationError, validate_call
 from time import time
 
@@ -103,6 +103,9 @@ class PonikaClient:
             if auth_response.success and auth_response.data
             else None
         )
+
+        if self.auth is None:
+            raise TeltonikaLoginException()
 
         return self.auth.token if self.auth else None
 

@@ -6,10 +6,26 @@ from ponika import PonikaClient
 
 from ponika.exceptions import TeltonikaLoginException
 from tests.mocks import (
-    TAILSCALE_CONFIG_RESPONSE,
     mock_endpoint,
     mock_login_with_validation,
 )
+
+# Tailscale mock responses
+TAILSCALE_CONFIG_RESPONSE = {
+    "success": True,
+    "data": [{
+        "id": "tailscale0",
+        "enabled": "1",
+        "auth_key": "",
+        "advert_routes": [],
+        "accept_routes": "0",
+        "exit_node": "0",
+        "auth_type": "url",
+        "default_route": "0",
+        "exit_node_ip": "",
+        "login_server": ""
+    }]
+}
 
 
 @pytest.mark.unit
@@ -116,10 +132,8 @@ def test_endpoint_with_correct_credentials_and_validation():
     
     # Make request - should succeed
     result = client.tailscale.get_config()
-    assert result.success
-    assert result.data is not None
 
-    assert result.data[0].id == "tailscale0"
+    assert result[0].id == "tailscale0"
 
 
 @pytest.mark.unit

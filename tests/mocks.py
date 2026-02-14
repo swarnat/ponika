@@ -45,32 +45,6 @@ ERROR_UNAUTHORIZED = {
     }]
 }
 
-# Tailscale mock responses
-TAILSCALE_CONFIG_RESPONSE = {
-    "success": True,
-    "data": [{
-        "id": "tailscale0",
-        "enabled": "1",
-        "auth_key": "",
-        "advert_routes": [],
-        "accept_routes": "0",
-        "exit_node": "0",
-        "auth_type": "url",
-        "default_route": "0",
-        "exit_node_ip": "",
-        "login_server": ""
-    }]
-}
-
-TAILSCALE_STATUS_RESPONSE = {
-    "success": True,
-    "data": [{
-        "status": "running",
-        "url": "https://login.tailscale.com/...",
-        "ip": ["100.64.0.1"],
-        "message": []
-    }]
-}
 
 # Session mock responses
 SESSION_STATUS_RESPONSE = {
@@ -82,16 +56,152 @@ SESSION_STATUS_RESPONSE = {
     }
 }
 
-# Modems mock responses
-MODEMS_STATUS_RESPONSE = {
-    "success": True,
-    "data": [{
-        "modem_id": "2-1",
-        "connection_state": "connected",
-        "signal_strength": -75,
-        "operator": "Test Network"
-    }]
-}
+
+# # DHCP Server IPv4 mock responses
+# DHCP_IPV4_SERVER_CONFIG_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "lan",
+#         "interface": "br-lan",
+#         "enable_dhcpv4": "1",
+#         "mode": "server",
+#         "start_ip": "192.168.1.100",
+#         "end_ip": "192.168.1.200",
+#         "leasetime": "12h",
+#         "dynamicdhcp": True,
+#         "force": False,
+#         "netmask": "255.255.255.0"
+#     }]
+# }
+
+# DHCP_IPV4_SERVER_STATUS_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "lan",
+#         "running": True,
+#         "interface": ["br-lan"]
+#     }]
+# }
+
+# DHCP_IPV4_DYNAMIC_LEASES_RESPONSE = {
+#     "success": True,
+#     "data": [
+#         {
+#             "expires": 43200,
+#             "macaddr": "00:11:22:33:44:55",
+#             "ipaddr": "192.168.1.100",
+#             "hostname": "test-device",
+#             "interface": "br-lan"
+#         }
+#     ]
+# }
+
+# # Users mock responses
+# USER_CONFIG_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "user1",
+#         "username": "testuser",
+#         "group": "admin",
+#         "ssh_enable": False
+#     }]
+# }
+
+# USER_CREATE_RESPONSE = {
+#     "success": True,
+#     "data": {
+#         "id": "user1",
+#         "username": "testuser",
+#         "group": "admin",
+#         "ssh_enable": False
+#     }
+# }
+
+# USER_DELETE_RESPONSE = {
+#     "success": True,
+#     "data": {
+#         "id": "user1"
+#     }
+# }
+
+# # IP Routes IPv4 mock responses
+# IP_ROUTES_IPV4_CONFIG_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "route1",
+#         "interface": "wan",
+#         "target": "10.0.0.0",
+#         "netmask": "255.255.255.0",
+#         "gateway": "192.168.1.1",
+#         "metric": "0"
+#     }]
+# }
+
+# IP_ROUTES_IPV4_STATUS_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "interface": "wan",
+#         "target": "10.0.0.0/24",
+#         "gateway": "192.168.1.1",
+#         "metric": 0
+#     }]
+# }
+
+# # Wireless mock responses
+# WIRELESS_DEVICES_CONFIG_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "radio0",
+#         "type": "mac80211",
+#         "channel": "auto",
+#         "hwmode": "11g",
+#         "disabled": False
+#     }]
+# }
+
+# WIRELESS_INTERFACES_CONFIG_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "id": "wlan0",
+#         "device": "radio0",
+#         "mode": "ap",
+#         "ssid": "TestNetwork",
+#         "encryption": "psk2",
+#         "key": "testpassword",
+#         "disabled": False
+#     }]
+# }
+
+# WIRELESS_INTERFACES_STATUS_RESPONSE = {
+#     "success": True,
+#     "data": [{
+#         "interface": "wlan0",
+#         "ssid": "TestNetwork",
+#         "mode": "Master",
+#         "channel": 6,
+#         "signal": -45,
+#         "noise": -95,
+#         "bitrate": 144.4
+#     }]
+# }
+
+# # Firmware mock responses
+# FIRMWARE_STATUS_RESPONSE = {
+#     "success": True,
+#     "data": {
+#         "current_version": "7.19.2",
+#         "available_version": "7.20.0",
+#         "update_available": True
+#     }
+# }
+
+# FIRMWARE_UPLOAD_RESPONSE = {
+#     "success": True,
+#     "data": {
+#         "uploaded": True,
+#         "filename": "firmware.bin"
+#     }
+# }
 
 
 def login_callback(request):

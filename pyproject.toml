@@ -4,7 +4,8 @@ version = "0.5.0"
 description = "Teltonika Device API Client"
 readme = "README.md"
 authors = [
-    { name = "Ben Evans", email = "ben@bluechimp.io" }
+    { name = "Ben Evans", email = "ben@bluechimp.io" },
+    { name = "Stefan Warnat", email = "ich@stefanwarnat.de" },
 ]
 requires-python = ">=3.13"
 dependencies = [
@@ -22,5 +23,6 @@ build-backend = "hatchling.build"
 [dependency-groups]
 dev = [
     "pytest>=8.4.0",
+    "responses>=0.25.0",
     "ruff>=0.11.13",
 ]

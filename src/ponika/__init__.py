@@ -24,6 +24,7 @@ from ponika.endpoints.modems import ModemsEndpoint
 from ponika.endpoints.session import SessionEndpoint
 from ponika.endpoints.tailscale import TailscaleEndpoint
 from ponika.endpoints.unauthorized import UnauthorizedEndpoint
+from ponika.endpoints.wireguard import WireguardEndpoint
 from ponika.endpoints.wireless import WirelessEndpoint
 from ponika.models import T, ApiResponse, BasePayload, Token, BaseModel
 
@@ -81,6 +82,7 @@ class PonikaClient:
         self.backup = BackupEndpoint(self)
         self.dhcp = DHCPEndpoint(self)
         self.tailscale = TailscaleEndpoint(self)
+        self.wireguard = WireguardEndpoint(self)
         self.wireless = WirelessEndpoint(self)
         self.internet_connection = InternetConnectionEndpoint(self)
         self.ip_routes = IPRouteEndpoint(self)

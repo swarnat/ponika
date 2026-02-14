@@ -3,7 +3,7 @@ from ponika.endpoints.wireguard.config import WireguardConfigCreatePayload
 
 response = connection.wireguard.config.create(
     WireguardConfigCreatePayload(
-        id="wg1",
+        id="wg0",
         enabled=False,
         private_key="a" * 44,
         listen_port="51820",

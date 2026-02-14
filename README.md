@@ -6,6 +6,7 @@ Ponika is a Python library for interacting with the Teltonika devices.
 
 | Modul | Endpoint | Status |
 | ----- | -------- | ------ |
+| Backup |  | ✅ |
 | Data Usages  | SIM Card | ✅ |
 | Data Usages  | Modem | ⭕ |
 | Data Usages  | eSIM | ❌ |
@@ -21,22 +22,23 @@ Ponika is a Python library for interacting with the Teltonika devices.
 | IP Routes  | IPv4 Routes | ✅ |
 | IP Routes  | IPv6 Routes | ✅ |
 | Modem |  | 🟡 |
-| MQTT | Broker  | ⭕ |
-| MQTT | Publisher  | ⭕ |
+| MQTT | Broker  | ❌ |
+| MQTT | Publisher  | ❌ |
 | OpenVPN |  | ⭕ |
 | SMS | Send | ✅ |
-| SMS | Read | ⭕ |
-| Tailscale |  | 🟡 |
+| SMS | Read/Delete | ✅ |
+| Tailscale |  | ⚠️ |
 | Usermanagement  | - | ✅ |
-| Wireguard |  | ⭕ |
+| Wireguard |  | ✅ |
 | Wireless  | Devices | ✅ |
 | Wireless  | Interfaces | ✅ |
 | Zerotier |  | ⭕ |
 
 ✅ - Supported  
-🟡 - Partially implemented
+⚠️ - Supported, but lack of practical use case, not real tested  
+🟡 - Partially implemented  
 ⭕ - Will be implemented   
-❌ - Will not implemented at the moment (Several reasons)
+❌ - Will not implemented at the moment (missing hardware or test case)
 ## Installation
 
 You can install Ponika using pip:
@@ -119,20 +121,32 @@ The project is setup to use [`uv`](https://docs.astral.sh/uv/) for development a
 uv sync
 ```
 
-To run the tests, you can use the following command, updating the environment variables as needed:
+### Testing
 
+Ponika includes both unit tests (with mocked responses) and integration tests (requiring real hardware).
+
+**Run unit tests only (no hardware required):**
+```bash
+uv run pytest -m unit
+```
+
+**Run integration tests (requires real hardware):**
 ```bash
 # Required variables
-# ---------------------
 export TELTONIKA_HOST=192.168.1.1
 export TELTONIKA_USERNAME=admin
 export TELTONIKA_PASSWORD=password
 
 # Optional variables
-# ---------------------
-# Enables SMS sending tests
-export MOBILE_NUMBER=441234567890
+export MOBILE_NUMBER=441234567890  # Enables SMS sending tests
 
-# Run the tests
+# Run integration tests
+uv run pytest -m integration
+```
+
+**Run all tests:**
+```bash
 uv run pytest
 ```
+
+For detailed information about writing and running tests, see [docs/TESTING.md](docs/TESTING.md).

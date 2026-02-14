@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade uv
-        uv pip install -e ".[dev]"
+        uv pip install -e ".[dev]" --system
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names

@@ -1,6 +1,16 @@
 
 from dataclasses import fields
-from typing import TYPE_CHECKING, Generic, List, Type, TypeVar, cast, overload
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Generic,
+    List,
+    Type,
+    TypeVar,
+    cast,
+    get_origin,
+    overload,
+)
 
 from pydantic import ValidationError
 
@@ -72,6 +82,9 @@ class StatusEndpoint(Generic[TStatusResponseModel]):
 
 class DeleteEndpoint(Generic[TDeleteResponse]):
     delete_reponse_model = Type[TDeleteResponse]
+    allow_bulk_delete: bool = False
+    bulk_delete_endpoint_path: str | None = None
+    bulk_delete_response_model: Any | None = None
 
     def delete(self, item_id: str | int) -> TDeleteResponse:
         response = self._client._delete(
@@ -81,7 +94,36 @@ class DeleteEndpoint(Generic[TDeleteResponse]):
         if not response.success:
             raise TeltonikaApiException(response.errors)
 
-        return response.data
+        return cast(TDeleteResponse, response.data)
+
+    def delete_bulk(self, item_ids: List[str | int]) -> List[TDeleteResponse]:
+        if not self.allow_bulk_delete:
+            raise ValueError(
+                f"{self.__class__.__name__}.delete_bulk() is not available "
+                "for this endpoint."
+            )
+
+        endpoint = self.bulk_delete_endpoint_path or self.endpoint_path
+        response_data_model = (
+            self.bulk_delete_response_model or self.delete_reponse_model
+        )
+
+        response_model = (
+            response_data_model
+            if get_origin(response_data_model) is list
+            else List[response_data_model]
+        )
+
+        response = self._client._delete(
+            endpoint=endpoint,
+            data_model=response_model,
+            params={"data": item_ids},
+        )
+
+        if not response.success or response.data is None:
+            raise TeltonikaApiException(response.errors)
+
+        return cast(List[TDeleteResponse], response.data)
 
 
 class CreateEndpoint(Generic[TItemCreatePayload, TConfigResponse]):

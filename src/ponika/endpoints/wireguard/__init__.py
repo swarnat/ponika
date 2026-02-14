@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING
 
+from ponika.endpoints.wireguard.actions import ActionsEndpoint
 from ponika.endpoints.wireguard.config import ConfigEndpoint
 
 if TYPE_CHECKING:
@@ -10,3 +11,4 @@ class WireguardEndpoint:
     def __init__(self, client: "PonikaClient") -> None:
         self._client: "PonikaClient" = client
         self.config = ConfigEndpoint(client)
+        self.actions = ActionsEndpoint(client)

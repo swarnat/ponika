@@ -6,12 +6,8 @@ import pytest
 import responses
 
 from ponika.endpoints.wireguard.peers import (
-    WireguardPeerBulkDeletePayload,
-    WireguardPeerBulkUpdatePayload,
-    WireguardPeerCreatePayload,
-    WireguardPeerDeletePayload,
-    WireguardPeerGetPayload,
-    WireguardPeerUpdatePayload,
+    WireguardPeerCreateItemPayload,
+    WireguardPeerUpdateItemPayload,
 )
 from ponika.exceptions import TeltonikaApiException
 from tests.mocks import mock_endpoint, mock_error_response
@@ -58,91 +54,75 @@ WIREGUARD_PEER_BULK_DELETE_RESPONSE = {
 
 @pytest.mark.unit
 @responses.activate
-def test_wireguard_peers_get_list(mock_client):
+def test_wireguard_peers_config_api_crud(mock_client):
     mock_endpoint(
         'get',
         '/wireguard/wg0/peers/config',
         WIREGUARD_PEERS_LIST_RESPONSE,
     )
-
-    result = mock_client.wireguard.peers.get_config(
-        WireguardPeerGetPayload(id='wg0')
-    )
-
-    assert len(result) == 1
-    assert result[0].id == 'peer1'
-    assert result[0].route_allowed_ips is True
-
-
-@pytest.mark.unit
-@responses.activate
-def test_wireguard_peers_get_single(mock_client):
     mock_endpoint(
         'get',
         '/wireguard/wg0/peers/config/peer1',
         WIREGUARD_PEER_SINGLE_RESPONSE,
+        include_login=False,
     )
-
-    result = mock_client.wireguard.peers.get_config(
-        WireguardPeerGetPayload(id='wg0', peers_id='peer1')
-    )
-
-    assert result.id == 'peer1'
-
-
-@pytest.mark.unit
-@responses.activate
-def test_wireguard_peers_create(mock_client):
     mock_endpoint(
         'post',
         '/wireguard/wg0/peers/config',
         WIREGUARD_PEER_SINGLE_RESPONSE,
+        include_login=False,
     )
-
-    result = mock_client.wireguard.peers.create(
-        WireguardPeerCreatePayload(
-            id='wg0',
-            peer_id='peer1',
-            public_key='p' * 44,
-            allowed_ips=['10.10.0.2/32'],
-            route_allowed_ips=True,
-        )
-    )
-
-    assert result.id == 'peer1'
-    request_body = _request_json_body(1)
-    assert request_body['data']['id'] == 'peer1'
-    assert request_body['data']['route_allowed_ips'] == '1'
-
-
-@pytest.mark.unit
-@responses.activate
-def test_wireguard_peers_update(mock_client):
     mock_endpoint(
         'put',
         '/wireguard/wg0/peers/config/peer1',
         WIREGUARD_PEER_SINGLE_RESPONSE,
+        include_login=False,
+    )
+    mock_endpoint(
+        'delete',
+        '/wireguard/wg0/peers/config/peer1',
+        WIREGUARD_PEER_DELETE_RESPONSE,
+        include_login=False,
     )
 
-    result = mock_client.wireguard.peers.update(
-        WireguardPeerUpdatePayload(
-            id='wg0',
-            peers_id='peer1',
-            public_key='p' * 44,
-            allowed_ips=['10.10.0.3/32'],
-            route_allowed_ips=False,
-        )
-    )
+    endpoint = mock_client.wireguard.peers.config('wg0')
 
-    assert result.id == 'peer1'
-    request_body = _request_json_body(1)
-    assert request_body['data']['id'] == 'peer1'
-    assert request_body['data']['route_allowed_ips'] == '0'
+    list_result = endpoint.get_config()
+    single_result = endpoint.get_config('peer1')
+
+    create_payload = WireguardPeerCreateItemPayload(id='peer1')
+    create_payload.public_key = 'p' * 44
+    create_payload.allowed_ips = ['10.10.0.2/32']
+    create_payload.route_allowed_ips = True
+    create_result = endpoint.create(create_payload)
+
+    update_payload = WireguardPeerUpdateItemPayload(id='peer1')
+    update_payload.public_key = 'p' * 44
+    update_payload.allowed_ips = ['10.10.0.3/32']
+    update_payload.route_allowed_ips = False
+    update_result = endpoint.update(update_payload)
+
+    delete_result = endpoint.delete('peer1')
+
+    assert len(list_result) == 1
+    assert list_result[0].route_allowed_ips is True
+    assert single_result.id == 'peer1'
+    assert create_result.id == 'peer1'
+    assert update_result.id == 'peer1'
+    assert delete_result.id == 'peer1'
+
+    create_body = _request_json_body(3)
+    assert create_body['data']['id'] == 'peer1'
+    assert create_body['data']['route_allowed_ips'] == '1'
+
+    update_body = _request_json_body(4)
+    assert 'id' not in update_body['data']
+    assert update_body['data']['route_allowed_ips'] == '0'
 
 
 @pytest.mark.unit
 @responses.activate
-def test_wireguard_peers_update_bulk(mock_client):
+def test_wireguard_peers_config_api_bulk(mock_client):
     bulk_response = {
         'success': True,
         'data': [
@@ -154,73 +134,44 @@ def test_wireguard_peers_update_bulk(mock_client):
             },
         ],
     }
+
     mock_endpoint('put', '/wireguard/wg0/peers/config', bulk_response)
-
-    result = mock_client.wireguard.peers.update_bulk(
-        [
-            WireguardPeerBulkUpdatePayload(
-                id='wg0',
-                peers_id='peer1',
-                public_key='p' * 44,
-                allowed_ips=['10.10.0.2/32'],
-            ),
-            WireguardPeerBulkUpdatePayload(
-                id='wg0',
-                peers_id='peer2',
-                public_key='q' * 44,
-                allowed_ips=['10.10.0.4/32'],
-            ),
-        ]
-    )
-
-    assert len(result) == 2
-    assert result[1].id == 'peer2'
-    request_body = _request_json_body(1)
-    assert request_body['data'][0]['id'] == 'peer1'
-    assert request_body['data'][1]['id'] == 'peer2'
-
-
-@pytest.mark.unit
-@responses.activate
-def test_wireguard_peers_delete(mock_client):
-    mock_endpoint(
-        'delete',
-        '/wireguard/wg0/peers/config/peer1',
-        WIREGUARD_PEER_DELETE_RESPONSE,
-    )
-
-    result = mock_client.wireguard.peers.delete(
-        WireguardPeerDeletePayload(id='wg0', peers_id='peer1')
-    )
-
-    assert result.id == 'peer1'
-
-
-@pytest.mark.unit
-@responses.activate
-def test_wireguard_peers_delete_bulk(mock_client):
     mock_endpoint(
         'delete',
         '/wireguard/wg0/peers/config',
         WIREGUARD_PEER_BULK_DELETE_RESPONSE,
+        include_login=False,
     )
 
-    result = mock_client.wireguard.peers.delete_bulk(
-        WireguardPeerBulkDeletePayload(
-            id='wg0',
-            peers_ids=['peer1', 'peer2'],
-        )
-    )
+    endpoint = mock_client.wireguard.peers.config('wg0')
 
-    assert result[0].id == 'peer1'
-    assert result[1].id == 'peer2'
-    request_body = _request_json_body(1)
-    assert request_body['data'] == ['peer1', 'peer2']
+    payload1 = WireguardPeerUpdateItemPayload(id='peer1')
+    payload1.public_key = 'p' * 44
+    payload1.allowed_ips = ['10.10.0.2/32']
+
+    payload2 = WireguardPeerUpdateItemPayload(id='peer2')
+    payload2.public_key = 'q' * 44
+    payload2.allowed_ips = ['10.10.0.4/32']
+
+    update_result = endpoint.update_bulk([payload1, payload2])
+    delete_result = endpoint.delete_bulk(['peer1', 'peer2'])
+
+    assert len(update_result) == 2
+    assert update_result[1].id == 'peer2'
+    assert delete_result[0].id == 'peer1'
+    assert delete_result[1].id == 'peer2'
+
+    update_body = _request_json_body(1)
+    assert update_body['data'][0]['id'] == 'peer1'
+    assert update_body['data'][1]['id'] == 'peer2'
+
+    delete_body = _request_json_body(2)
+    assert delete_body['data'] == ['peer1', 'peer2']
 
 
 @pytest.mark.unit
 @responses.activate
-def test_wireguard_peers_error_raises(mock_client):
+def test_wireguard_peers_config_api_error_raises(mock_client):
     mock_error_response(
         'get',
         '/wireguard/wg0/peers/config',
@@ -229,7 +180,6 @@ def test_wireguard_peers_error_raises(mock_client):
         error_source='wireguard',
     )
 
+    endpoint = mock_client.wireguard.peers.config('wg0')
     with pytest.raises(TeltonikaApiException):
-        mock_client.wireguard.peers.get_config(
-            WireguardPeerGetPayload(id='wg0')
-        )
+        endpoint.get_config()

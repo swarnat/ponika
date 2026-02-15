@@ -1,15 +1,12 @@
 from examples.config import connection
-from ponika.endpoints.wireguard.peers import WireguardPeerUpdatePayload
+from ponika.endpoints.wireguard.peers import WireguardPeerUpdateItemPayload
 
-response = connection.wireguard.peers.update(
-    WireguardPeerUpdatePayload(
-        id='wg0',
-        peers_id='peer1',
-        public_key='p' * 44,
-        allowed_ips=['10.10.0.3/32'],
-        route_allowed_ips=False,
-    )
-)
+payload = WireguardPeerUpdateItemPayload(id='peer1')
+payload.public_key = 'p' * 44
+payload.allowed_ips = ['10.10.0.3/32']
+payload.route_allowed_ips = False
+
+response = connection.wireguard.peers.config('wg0').update(payload)
 
 print(type(response))
 print(response)

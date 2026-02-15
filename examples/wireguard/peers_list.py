@@ -1,9 +1,6 @@
 from examples.config import connection
-from ponika.endpoints.wireguard.peers import WireguardPeerGetPayload
 
-response = connection.wireguard.peers.get_config(
-    WireguardPeerGetPayload(id='wg0')
-)
+response = connection.wireguard.peers.config('wg0').get_config()
 
 print(type(response))
 print(response)

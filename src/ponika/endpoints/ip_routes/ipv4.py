@@ -55,8 +55,8 @@ class IPv4RouteEndpoint(
         IPv4RouteDeleteResponse,
     ],
 ):
-    endpoint_path = "/ip_routes/ipv4/config"
-    status_endpoint_path = "/ip_routes/ipv4/status"
+    endpoint_path = '/ip_routes/ipv4/config'
+    status_endpoint_path = '/ip_routes/ipv4/status'
     allow_status_with_id = False
 
     config_response_model = Ipv4RouteConfigResponse

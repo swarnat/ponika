@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 from pydantic import BaseModel as PydanticBaseModel, ConfigDict
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class BasePayload(PydanticBaseModel):
@@ -18,7 +18,7 @@ class BasePayload(PydanticBaseModel):
             if isinstance(value, list):
                 return [convert(v) for v in value]
             if isinstance(value, bool):
-                return "1" if value is True else "0"
+                return '1' if value is True else '0'
             if isinstance(value, dict):
                 return {k: convert(v) for k, v in value.items()}
 
@@ -41,7 +41,9 @@ class TeltonikaApiError(BaseModel):
     section: Optional[str] = None
 
     def __str__(self) -> str:
-        return f"Error {self.code}: {self.error} ({self.source}, {self.section})"
+        return (
+            f'Error {self.code}: {self.error} ({self.source}, {self.section})'
+        )
 
 
 class ApiResponse(BaseModel, Generic[T]):

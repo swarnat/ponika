@@ -1,6 +1,11 @@
 from typing import List, Literal, Optional
 
-from ponika.endpoints import Endpoint, ReadEndpoint, StatusEndpoint, UpdateEndpoint
+from ponika.endpoints import (
+    Endpoint,
+    ReadEndpoint,
+    StatusEndpoint,
+    UpdateEndpoint,
+)
 from ponika.models import BaseModel, BasePayload
 
 
@@ -10,8 +15,8 @@ class TailscaleConfigBase:
     advert_routes: Optional[List[str]] = None
     accept_routes: Optional[str] = None
     exit_node: Optional[str] = None
-    auth_type: Literal["url", "key"]
-    default_route: Optional[Literal["0", "1"]] = None
+    auth_type: Literal['url', 'key']
+    default_route: Optional[Literal['0', '1']] = None
     exit_node_ip: Optional[str] = None
     login_server: Optional[str] = None
 
@@ -37,8 +42,8 @@ class TailscaleEndpoint(
     UpdateEndpoint[TailscaleConfigUpdatePayload, TailscaleConfigResponse],
     StatusEndpoint[TailscaleStatusResponse],
 ):
-    endpoint_path = "/tailscale/config"
-    status_endpoint_path = "/tailscale/status"
+    endpoint_path = '/tailscale/config'
+    status_endpoint_path = '/tailscale/status'
     allow_status_with_id = False
     allow_bulk_update = True
 

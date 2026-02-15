@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class IPRouteEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+    def __init__(self, client: 'PonikaClient') -> None:
+        self._client: 'PonikaClient' = client
         self.routes_ipv4 = IPv4RouteEndpoint(client)
         self.routes_ipv6 = Ipv6RouteEndpoint(client)

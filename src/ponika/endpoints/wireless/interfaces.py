@@ -18,7 +18,7 @@ class WirelessInterfaceBase:
     mesh_id: Optional[str] = None
     ssid: Optional[str] = None
     bssid: Optional[str] = None
-    network: Optional[str] = "lan"
+    network: Optional[str] = 'lan'
     mesh_fwding: Optional[str] = None
     mesh_rssi_threshold: Optional[str] = None
     hidden: Optional[str] = None
@@ -75,25 +75,25 @@ class WirelessInterfaceBase:
 
 class WirelessInterfaceConfigResponse(BaseModel, WirelessInterfaceBase):
     key_set: Optional[str] = Field(
-        serialization_alias="key:set", exclude=True, default=None
+        serialization_alias='key:set', exclude=True, default=None
     )
     auth_secret_set: Optional[str] = Field(
-        serialization_alias="auth_secret:set", exclude=True, default=None
+        serialization_alias='auth_secret:set', exclude=True, default=None
     )
     acct_secret_set: Optional[str] = Field(
-        serialization_alias="acct_secret:set", exclude=True, default=None
+        serialization_alias='acct_secret:set', exclude=True, default=None
     )
     password_set: Optional[str] = Field(
-        serialization_alias="password:set", exclude=True, default=None
+        serialization_alias='password:set', exclude=True, default=None
     )
     pkcs_passwd_set: Optional[str] = Field(
-        serialization_alias="pkcs_passwd:set", exclude=True, default=None
+        serialization_alias='pkcs_passwd:set', exclude=True, default=None
     )
     priv_key_pwd_set: Optional[str] = Field(
-        serialization_alias="priv_key_pwd:set", exclude=True, default=None
+        serialization_alias='priv_key_pwd:set', exclude=True, default=None
     )
     priv_key2_pwd_set: Optional[str] = Field(
-        serialization_alias="priv_key2_pwd:set", exclude=True, default=None
+        serialization_alias='priv_key2_pwd:set', exclude=True, default=None
     )
 
 
@@ -153,8 +153,8 @@ class InterfacesEndpoint(
     ],
     StatusEndpoint[WirelessInterfacesStatusResponse],
 ):
-    endpoint_path = "/wireless/interfaces/config"
-    status_endpoint_path = "/wireless/interfaces/status"
+    endpoint_path = '/wireless/interfaces/config'
+    status_endpoint_path = '/wireless/interfaces/status'
 
     config_response_model = WirelessInterfaceConfigResponse
     create_modele_model = WirelessInterfaceCreatePayload

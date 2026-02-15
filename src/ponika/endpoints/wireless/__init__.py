@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 
 class WirelessEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+    def __init__(self, client: 'PonikaClient') -> None:
+        self._client: 'PonikaClient' = client
         self.interfaces = InterfacesEndpoint(client)
         self.devices = DevicesEndpoint(client)

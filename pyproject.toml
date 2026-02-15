@@ -31,7 +31,9 @@ dev = [
 # E722 - Ignore bare except within tests
 "**/{tests,docs,tools}/*" = ["E722"]
 
+[tool.ruff]
+line-length = 79
+
 [tool.ruff.format]
 # 5. Use single quotes in `ruff format`.
 quote-style = "single"
-line-length = 79

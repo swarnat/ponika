@@ -77,8 +77,8 @@ class DevicesEndpoint(
     UpdateEndpoint[WirelessDeviceUpdatePayload, WirelessDeviceConfigResponse],
     StatusEndpoint[WirelessDevicesStatusResponse],
 ):
-    endpoint_path = "/wireless/devices/config"
-    status_endpoint_path = "/wireless/devices/status"
+    endpoint_path = '/wireless/devices/config'
+    status_endpoint_path = '/wireless/devices/status'
 
     config_response_model = WirelessDeviceConfigResponse
     update_model = WirelessDeviceUpdatePayload

@@ -48,7 +48,7 @@ class FirmwareDeviceFotaUpdateStatusResponse(BaseModel):
 class FirmwareDeviceEndpoint(Endpoint):
     def get_status(self) -> FirmwareDeviceStatusResponse:
         response = ApiResponse[FirmwareDeviceStatusResponse].model_validate(
-            self._client._get("/firmware/device/status")
+            self._client._get('/firmware/device/status')
         )
 
         if not response.success:
@@ -57,9 +57,9 @@ class FirmwareDeviceEndpoint(Endpoint):
         return response.data
 
     def get_progress_status(self) -> FirmwareDeviceProgressStatusResponse:
-        response = ApiResponse[FirmwareDeviceProgressStatusResponse].model_validate(
-            self._client._get("/firmware/device/progress/status")
-        )
+        response = ApiResponse[
+            FirmwareDeviceProgressStatusResponse
+        ].model_validate(self._client._get('/firmware/device/progress/status'))
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
@@ -67,9 +67,9 @@ class FirmwareDeviceEndpoint(Endpoint):
         return response.data
 
     def get_fota_update_status(self) -> FirmwareDeviceFotaUpdateStatusResponse:
-        response = ApiResponse[FirmwareDeviceFotaUpdateStatusResponse].model_validate(
-            self._client._get("/firmware/device/updates/status")
-        )
+        response = ApiResponse[
+            FirmwareDeviceFotaUpdateStatusResponse
+        ].model_validate(self._client._get('/firmware/device/updates/status'))
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
@@ -78,7 +78,7 @@ class FirmwareDeviceEndpoint(Endpoint):
 
     def download_from_fota(self):
         response = self._client._post(
-            endpoint="/firmware/actions/fota_download",
+            endpoint='/firmware/actions/fota_download',
             data_model=None,
         )
 
@@ -94,14 +94,14 @@ class FirmwareDeviceEndpoint(Endpoint):
         suppress_validation: bool = False,
     ):
         params = {
-            "keep_settings": "1" if keep_settings else "0",
-            "suppress_validation": "1" if suppress_validation else "0",
+            'keep_settings': '1' if keep_settings else '0',
+            'suppress_validation': '1' if suppress_validation else '0',
         }
 
         response = self._client._post_files(
-            endpoint="/firmware/actions/upload_device_firmware",
+            endpoint='/firmware/actions/upload_device_firmware',
             data_model=FirmwareDeviceUploadResponse,
-            files={"file": file_path},
+            files={'file': file_path},
             params=params,
         )
 
@@ -112,7 +112,7 @@ class FirmwareDeviceEndpoint(Endpoint):
 
     def verify_uploaded_firmware(self) -> FirmwareDeviceUploadResponse:
         response = self._client._post(
-            endpoint="/firmware/actions/verify",
+            endpoint='/firmware/actions/verify',
             data_model=FirmwareDeviceUploadResponse,
         )
 
@@ -123,7 +123,7 @@ class FirmwareDeviceEndpoint(Endpoint):
 
     def delete_uploaded_firmware(self) -> FirmwareDeviceUploadDeleteResponse:
         response = self._client._post(
-            endpoint="/firmware/actions/delete_device_firmware",
+            endpoint='/firmware/actions/delete_device_firmware',
             data_model=FirmwareDeviceUploadDeleteResponse,
         )
 
@@ -136,12 +136,12 @@ class FirmwareDeviceEndpoint(Endpoint):
         self, keep_settings: bool = True, suppress_validation: bool = False
     ):
         params = {
-            "keep_settings": "1" if keep_settings else "0",
-            "suppress_validation": "1" if suppress_validation else "0",
+            'keep_settings': '1' if keep_settings else '0',
+            'suppress_validation': '1' if suppress_validation else '0',
         }
 
         response = self._client._post_data(
-            endpoint="/firmware/actions/upgrade",
+            endpoint='/firmware/actions/upgrade',
             params=params,
             data_model=None,
         )

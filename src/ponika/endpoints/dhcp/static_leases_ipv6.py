@@ -32,7 +32,7 @@ class StaticLeasesIPv6Endpoint(
         StaticLeaseIpv6DeleteResponse,
     ]
 ):
-    endpoint_path = "/dhcp/static_leases/ipv6/config"
+    endpoint_path = '/dhcp/static_leases/ipv6/config'
 
     config_response_model = StaticLeaseIpv6ConfigResponse
     create_model = StaticLeaseIpv6CreatePayload

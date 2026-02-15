@@ -32,7 +32,7 @@ class StaticLeasesIPv4Endpoint(
         StaticLeaseIpv4DeleteResponse,
     ]
 ):
-    endpoint_path = "/dhcp/static_leases/ipv4/config"
+    endpoint_path = '/dhcp/static_leases/ipv4/config'
 
     config_response_model = StaticLeaseIpv4ConfigResponse
     create_model = StaticLeaseIpv4CreatePayload

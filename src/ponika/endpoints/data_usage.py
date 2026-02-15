@@ -18,33 +18,33 @@ class DataUsagesApiResponse(BaseModel):
 
 
 class UsageInterval(str, Enum):
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
-    TOTAL = "total"
+    DAY = 'day'
+    WEEK = 'week'
+    MONTH = 'month'
+    TOTAL = 'total'
     # CUSTOM = "custom"
 
 
 class DataUsageEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+    def __init__(self, client: 'PonikaClient') -> None:
+        self._client: 'PonikaClient' = client
 
     # , custom_from_timestamp: int | None = None, custom_to_timestamp: int | None = None
     # "custom" is not supported
     def get_simcard_usage(self, interval: UsageInterval) -> List[List[int]]:
         """https://developers.teltonika-networks.com/reference/rut241/7.20/v1.12/data-usage#get-data_usage-interval-status"""
 
-        endpoint = f"/data_usage/{interval.value}/status"  # if interval is not UsageInterval.CUSTOM else f"/data_usage/{interval}/status?from={custom_from_timestamp}&to={custom_to_timestamp}"
+        endpoint = f'/data_usage/{interval.value}/status'  # if interval is not UsageInterval.CUSTOM else f"/data_usage/{interval}/status?from={custom_from_timestamp}&to={custom_to_timestamp}"
         response = self._client._get(endpoint)
 
         try:
             response_obj = DataUsagesApiResponse.model_validate(response)
         except ValidationError as e:
-            print(f"Error during request: GET {endpoint}")
+            print(f'Error during request: GET {endpoint}')
             print(
-                f"Error during response validation to class ApiResponse[{DataUsagesApiResponse}]"
+                f'Error during response validation to class ApiResponse[{DataUsagesApiResponse}]'
             )
-            print(f"Response we got: {response}")
+            print(f'Response we got: {response}')
             raise e
 
         if not response_obj.success or response_obj.data is None:

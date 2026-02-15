@@ -11,7 +11,7 @@ class GenerateKeysResponse(BaseModel):
 class ActionsEndpoint(Endpoint):
     def post_generate_keys(self) -> GenerateKeysResponse:
         response = self._client._post(
-            endpoint="/wireguard/actions/generate_keys",
+            endpoint='/wireguard/actions/generate_keys',
             data_model=GenerateKeysResponse,
         )
 

@@ -5,7 +5,7 @@ import responses
 from ponika import PonikaClient
 
 # Base URL for mocked API
-BASE_URL = "https://test-device:443/api"
+BASE_URL = 'https://test-device:443/api'
 
 # Standard login response for mocked tests
 # fmt: off

@@ -4,6 +4,9 @@ setup:
 
 checkformat:
 	.venv/bin/ruff check
+
+format:
+	.venv/bin/ruff format
 	
 test:
 	.venv/bin/pytest -m unit

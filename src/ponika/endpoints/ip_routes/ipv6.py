@@ -50,8 +50,8 @@ class Ipv6RouteEndpoint(
         Ipv6RouteDeleteResponse,
     ],
 ):
-    endpoint_path = "/ip_routes/ipv6/config"
-    status_endpoint_path = "/ip_routes/ipv6/status"
+    endpoint_path = '/ip_routes/ipv6/config'
+    status_endpoint_path = '/ip_routes/ipv6/status'
     allow_status_with_id = False
 
     config_response_model = Ipv6RouteConfigResponse

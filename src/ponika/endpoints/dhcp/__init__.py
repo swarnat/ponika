@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 
 class DHCPEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+    def __init__(self, client: 'PonikaClient') -> None:
+        self._client: 'PonikaClient' = client
         self.server_ipv4 = IPv4ServerEndpoint(client)
         self.server_ipv6 = IPv6ServerEndpoint(client)
         self.static_leases_ipv4 = StaticLeasesIPv4Endpoint(client)

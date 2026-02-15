@@ -44,7 +44,7 @@ class RemoveMessagesResponseData(BaseModel):
 
 
 class MessagesEndpoint(Endpoint):
-    def __init__(self, client: "PonikaClient") -> None:
+    def __init__(self, client: 'PonikaClient') -> None:
         super().__init__(client)
 
     def read(self) -> List[MessagesStatusResponseItem]:
@@ -52,7 +52,7 @@ class MessagesEndpoint(Endpoint):
         response_model = ApiResponse[List[MessagesStatusResponseItem]]
         response = response_model.model_validate(
             self._client._get(
-                "/messages/status",
+                '/messages/status',
             )
         )
 
@@ -61,7 +61,9 @@ class MessagesEndpoint(Endpoint):
 
         return response.data
 
-    def send(self, number: str, message: str, modem: str) -> SendMessageResponseData:
+    def send(
+        self, number: str, message: str, modem: str
+    ) -> SendMessageResponseData:
         """Send a message to a recipient."""
         payload = SendMessagePayload(
             number=number,
@@ -70,7 +72,7 @@ class MessagesEndpoint(Endpoint):
         )
 
         response = self._client._post_data(
-            endpoint="/messages/actions/send",
+            endpoint='/messages/actions/send',
             data_model=SendMessageResponseData,
             params=payload,
         )
@@ -92,7 +94,7 @@ class MessagesEndpoint(Endpoint):
         )
 
         response = self._client._post_data(
-            endpoint="/messages/actions/remove_messages",
+            endpoint='/messages/actions/remove_messages',
             data_model=RemoveMessagesResponseData,
             params=payload,
         )

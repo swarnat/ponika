@@ -80,8 +80,8 @@ class IPv6ServerEndpoint(
     UpdateEndpoint[DhcpIpv6ServerUpdatePayload, DhcpIpv6ServerConfigResponse],
     StatusEndpoint[DhcpIpv6ServersStatusResponse],
 ):
-    endpoint_path = "/dhcp/servers/ipv4/config"
-    status_endpoint_path = "/dhcp/servers/ipv4/status"
+    endpoint_path = '/dhcp/servers/ipv4/config'
+    status_endpoint_path = '/dhcp/servers/ipv4/status'
     allow_status_with_id = False
 
     config_response_model = DhcpIpv6ServerConfigResponse
@@ -91,7 +91,7 @@ class IPv6ServerEndpoint(
     status_response_model = DhcpIpv6ServersStatusResponse
 
     def get_dynamic_leases(self) -> List[DynamicLease]:
-        endpoint = "/dhcp/leases/ipv6/status"
+        endpoint = '/dhcp/leases/ipv6/status'
 
         response = self._client._get(endpoint)
 

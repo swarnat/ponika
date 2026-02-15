@@ -10,9 +10,9 @@ for route in response:
     break
 
 if delete_route is None:
-    print("No IPv4 route found to delete")
+    print('No IPv4 route found to delete')
 else:
-    print(f"Delete IPv4 route with id {delete_route.id}")
+    print(f'Delete IPv4 route with id {delete_route.id}')
 
     response = connection.ip_routes.routes_ipv4.delete(delete_route.id)
 

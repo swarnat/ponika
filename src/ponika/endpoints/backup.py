@@ -13,17 +13,17 @@ class BackupEncryptInfoPayload(BasePayload):
     encrypt: bool = False
     password: Optional[str] = None
 
-    @model_validator(mode="after")
-    def validate_password_requirement(self) -> "BackupEncryptInfoPayload":
+    @model_validator(mode='after')
+    def validate_password_requirement(self) -> 'BackupEncryptInfoPayload':
         if self.encrypt and not self.password:
-            raise ValueError("password is required when encrypt is true")
+            raise ValueError('password is required when encrypt is true')
         return self
 
 
 class BackupResetType(str, Enum):
-    SYSTEM = "system"
-    FACTORY = "factory"
-    USER = "user"
+    SYSTEM = 'system'
+    FACTORY = 'factory'
+    USER = 'user'
 
 
 class BackupResetSettingsPayload(BasePayload):
@@ -31,8 +31,8 @@ class BackupResetSettingsPayload(BasePayload):
 
 
 class BackupHashResponse(BaseModel):
-    sha256: str | None = "-"
-    md5: str | None = "-"
+    sha256: str | None = '-'
+    md5: str | None = '-'
 
 
 class BackupActionResponse(BaseModel):
@@ -56,13 +56,15 @@ class BackupStatusResponse(BaseModel):
 class BackupEndpoint(Endpoint):
     def get_status(self) -> BackupStatusResponse:
         response = ApiResponse[BackupStatusResponse].model_validate(
-            self._client._get("/backup/status")
+            self._client._get('/backup/status')
         )
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException("Missing data in backup status response")
+            raise TeltonikaApiException(
+                'Missing data in backup status response'
+            )
 
         return response.data
 
@@ -71,7 +73,7 @@ class BackupEndpoint(Endpoint):
         payload: Optional[BackupEncryptInfoPayload] = None,
     ) -> BackupHashResponse:
         response = self._client._post_data(
-            endpoint="/backup/actions/generate",
+            endpoint='/backup/actions/generate',
             data_model=BackupHashResponse,
             params=payload or BackupEncryptInfoPayload(),
         )
@@ -79,7 +81,9 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException("Missing data in backup generate response")
+            raise TeltonikaApiException(
+                'Missing data in backup generate response'
+            )
 
         return response.data
 
@@ -88,7 +92,7 @@ class BackupEndpoint(Endpoint):
         payload: Optional[BackupEncryptInfoPayload] = None,
     ) -> BackupActionResponse:
         response = self._client._post_data(
-            endpoint="/backup/actions/apply",
+            endpoint='/backup/actions/apply',
             data_model=BackupActionResponse,
             params=payload or BackupEncryptInfoPayload(),
         )
@@ -96,13 +100,15 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException("Missing data in backup apply response")
+            raise TeltonikaApiException(
+                'Missing data in backup apply response'
+            )
 
         return response.data
 
     def create_default(self) -> BackupActionResponse:
         response = self._client._post(
-            endpoint="/backup/actions/create_default",
+            endpoint='/backup/actions/create_default',
             data_model=BackupActionResponse,
         )
 
@@ -110,14 +116,14 @@ class BackupEndpoint(Endpoint):
             raise TeltonikaApiException(response.errors)
         if response.data is None:
             raise TeltonikaApiException(
-                "Missing data in backup create_default response"
+                'Missing data in backup create_default response'
             )
 
         return response.data
 
     def remove_default(self) -> BackupActionResponse:
         response = self._client._post(
-            endpoint="/backup/actions/remove_default",
+            endpoint='/backup/actions/remove_default',
             data_model=BackupActionResponse,
         )
 
@@ -125,33 +131,33 @@ class BackupEndpoint(Endpoint):
             raise TeltonikaApiException(response.errors)
         if response.data is None:
             raise TeltonikaApiException(
-                "Missing data in backup remove_default response"
+                'Missing data in backup remove_default response'
             )
 
         return response.data
 
     def download(self) -> bytes:
-        response = self._client._post_raw(endpoint="/backup/actions/download")
+        response = self._client._post_raw(endpoint='/backup/actions/download')
 
         if response.status_code >= 400:
             raise RuntimeError(
-                f"Download failed: {response.status_code} {response.text}"
+                f'Download failed: {response.status_code} {response.text}'
             )
 
         return response.content
 
     def download_to_file(self, target: str | Path) -> bool:
         target = Path(target)
-        response = self._client._post_raw(endpoint="/backup/actions/download")
+        response = self._client._post_raw(endpoint='/backup/actions/download')
 
         if response.status_code >= 400:
             raise RuntimeError(
-                f"Download failed: {response.status_code} {response.text}"
+                f'Download failed: {response.status_code} {response.text}'
             )
 
         target.parent.mkdir(parents=True, exist_ok=True)
 
-        with target.open("wb") as f:
+        with target.open('wb') as f:
             for chunk in response.iter_content(chunk_size=1024 * 1024):
                 if chunk:
                     f.write(chunk)
@@ -160,28 +166,32 @@ class BackupEndpoint(Endpoint):
 
     def upload(self, file_path: str) -> BackupActionResponse:
         response = self._client._post_files(
-            endpoint="/backup/actions/upload",
+            endpoint='/backup/actions/upload',
             data_model=BackupActionResponse,
-            files={"file": file_path},
+            files={'file': file_path},
         )
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException("Missing data in backup upload response")
+            raise TeltonikaApiException(
+                'Missing data in backup upload response'
+            )
 
         return response.data
 
     def delete(self) -> BackupHashResponse:
         response = self._client._post(
-            endpoint="/backup/actions/delete",
+            endpoint='/backup/actions/delete',
             data_model=BackupHashResponse,
         )
 
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException("Missing data in backup delete response")
+            raise TeltonikaApiException(
+                'Missing data in backup delete response'
+            )
 
         return response.data
 
@@ -190,7 +200,7 @@ class BackupEndpoint(Endpoint):
         payload: BackupResetSettingsPayload,
     ) -> BackupResetSettingsResponse:
         response = self._client._post_data(
-            endpoint="/backup/actions/reset_settings",
+            endpoint='/backup/actions/reset_settings',
             data_model=BackupResetSettingsResponse,
             params=payload,
         )
@@ -199,7 +209,7 @@ class BackupEndpoint(Endpoint):
             raise TeltonikaApiException(response.errors)
         if response.data is None:
             raise TeltonikaApiException(
-                "Missing data in backup reset settings response"
+                'Missing data in backup reset settings response'
             )
 
         return response.data

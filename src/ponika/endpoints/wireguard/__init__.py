@@ -9,8 +9,8 @@ if TYPE_CHECKING:
 
 
 class WireguardEndpoint:
-    def __init__(self, client: "PonikaClient") -> None:
-        self._client: "PonikaClient" = client
+    def __init__(self, client: 'PonikaClient') -> None:
+        self._client: 'PonikaClient' = client
         self.config = ConfigEndpoint(client)
         self.actions = ActionsEndpoint(client)
         self.peers = PeersEndpoint(client)

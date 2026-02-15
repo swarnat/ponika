@@ -61,19 +61,19 @@ class WireguardPeerBulkDeletePayload(BasePayload):
 class PeersEndpoint(Endpoint):
     @staticmethod
     def _build_base_endpoint(interface_id: str) -> str:
-        return f"/wireguard/{interface_id}/peers/config"
+        return f'/wireguard/{interface_id}/peers/config'
 
     @staticmethod
     def _peer_data_from_payload(payload: BasePayload) -> dict:
         data = payload.asdict()
-        data.pop("id", None)
+        data.pop('id', None)
 
-        peer_id = data.pop("peer_id", None)
-        peers_id = data.pop("peers_id", None)
+        peer_id = data.pop('peer_id', None)
+        peers_id = data.pop('peers_id', None)
         if peer_id is not None:
-            data["id"] = peer_id
+            data['id'] = peer_id
         elif peers_id is not None:
-            data["id"] = peers_id
+            data['id'] = peers_id
 
         return data
 
@@ -83,11 +83,11 @@ class PeersEndpoint(Endpoint):
     ) -> List[WireguardPeerConfigResponse] | WireguardPeerConfigResponse:
         endpoint = self._build_base_endpoint(payload.id)
         if payload.peers_id:
-            endpoint = f"{endpoint}/{payload.peers_id}"
+            endpoint = f'{endpoint}/{payload.peers_id}'
 
         query_params = None
         if payload.all_options is not None:
-            query_params = {"all_options": payload.all_options}
+            query_params = {'all_options': payload.all_options}
 
         response_model = (
             ApiResponse[WireguardPeerConfigResponse]
@@ -123,7 +123,7 @@ class PeersEndpoint(Endpoint):
         payload: WireguardPeerUpdatePayload,
     ) -> WireguardPeerConfigResponse:
         response = self._client._put_data(
-            endpoint=f"{self._build_base_endpoint(payload.id)}/{payload.peers_id}",
+            endpoint=f'{self._build_base_endpoint(payload.id)}/{payload.peers_id}',
             data_model=WireguardPeerConfigResponse,
             params=self._peer_data_from_payload(payload),
         )
@@ -138,22 +138,22 @@ class PeersEndpoint(Endpoint):
         payloads: List[WireguardPeerBulkUpdatePayload],
     ) -> List[WireguardPeerConfigResponse]:
         if not payloads:
-            raise ValueError("payloads must not be empty")
+            raise ValueError('payloads must not be empty')
 
         interface_id = payloads[0].id
         if any(item.id != interface_id for item in payloads):
-            raise ValueError("all payloads must use the same id")
+            raise ValueError('all payloads must use the same id')
 
         data = [self._peer_data_from_payload(payload) for payload in payloads]
         response = self._client._put(
             endpoint=self._build_base_endpoint(interface_id),
             data_model=object,
-            params={"data": data},
+            params={'data': data},
         )
 
-        response_obj = ApiResponse[List[WireguardPeerConfigResponse]].model_validate(
-            response.model_dump(mode="python")
-        )
+        response_obj = ApiResponse[
+            List[WireguardPeerConfigResponse]
+        ].model_validate(response.model_dump(mode='python'))
         if not response_obj.success or response_obj.data is None:
             raise TeltonikaApiException(response_obj.errors)
 
@@ -164,7 +164,7 @@ class PeersEndpoint(Endpoint):
         payload: WireguardPeerDeletePayload,
     ) -> WireguardPeerDeleteResponse:
         response = self._client._delete(
-            endpoint=f"{self._build_base_endpoint(payload.id)}/{payload.peers_id}",
+            endpoint=f'{self._build_base_endpoint(payload.id)}/{payload.peers_id}',
             data_model=WireguardPeerDeleteResponse,
         )
 
@@ -180,12 +180,12 @@ class PeersEndpoint(Endpoint):
         response = self._client._delete(
             endpoint=self._build_base_endpoint(payload.id),
             data_model=object,
-            params={"data": payload.peers_ids},
+            params={'data': payload.peers_ids},
         )
 
-        response_obj = ApiResponse[List[WireguardPeerDeleteResponse]].model_validate(
-            response.model_dump(mode="python")
-        )
+        response_obj = ApiResponse[
+            List[WireguardPeerDeleteResponse]
+        ].model_validate(response.model_dump(mode='python'))
         if not response_obj.success or response_obj.data is None:
             raise TeltonikaApiException(response_obj.errors)
 

@@ -40,7 +40,7 @@ class ConfigEndpoint(
         WireguardConfigDeleteResponse,
     ]
 ):
-    endpoint_path = "/wireguard/config"
+    endpoint_path = '/wireguard/config'
 
     config_response_model = WireguardConfigResponse
     create_model = WireguardConfigCreatePayload

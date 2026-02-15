@@ -5,7 +5,7 @@ import responses
 from typing import Any, Dict, Callable
 
 # Base URL for mocked API
-BASE_URL = "https://test-device:443/api"
+BASE_URL = 'https://test-device:443/api'
 
 # Standard responses
 # fmt: off

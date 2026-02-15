@@ -26,7 +26,7 @@ class UserConfigResponse(BaseModel):
 
 class UserUpdateDefinition(BasePayload):
     id: str
-    group: Optional[str] = ""
+    group: Optional[str] = ''
     ssh_enable: Optional[bool] = False
 
     current_password: Optional[str] = None
@@ -36,10 +36,13 @@ class UserUpdateDefinition(BasePayload):
 
 class UsersEndpoint(
     CRUDEndpoint[
-        UserDefinition, UserConfigResponse, UserUpdateDefinition, UserDeleteResponse
+        UserDefinition,
+        UserConfigResponse,
+        UserUpdateDefinition,
+        UserDeleteResponse,
     ]
 ):
-    endpoint_path = "/users/config"
+    endpoint_path = '/users/config'
 
     create_model = UserDefinition
     update_model = UserUpdateDefinition

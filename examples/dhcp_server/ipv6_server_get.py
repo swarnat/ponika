@@ -5,7 +5,7 @@ target_endpoint = connection.dhcp.server_ipv6
 response = target_endpoint.get_config()
 
 if len(response) == 0:
-    print("No DHCP IPv4 server configs found")
+    print('No DHCP IPv4 server configs found')
 else:
     first_item = response[0]
     response = target_endpoint.get_config(first_item.id)

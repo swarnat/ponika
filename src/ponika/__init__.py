@@ -46,9 +46,7 @@ class ClientConfig(BaseModel):
 
     @property
     def base_url(self) -> str:
-        return (
-            f'{"https" if self.tls else "http"}://{self.host}:{self.resolved_port}/api'
-        )
+        return f'{"https" if self.tls else "http"}://{self.host}:{self.resolved_port}/api'
 
 
 class PonikaClient:
@@ -97,7 +95,9 @@ class PonikaClient:
         if self.auth and self.auth.expires_at > int(time()):
             return self.auth.token
 
-        auth_response = self.login(self._config.username, self._config.password)
+        auth_response = self.login(
+            self._config.username, self._config.password
+        )
 
         self.auth = (
             Token(
@@ -127,7 +127,11 @@ class PonikaClient:
             f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             params=params,
-            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
+            headers=(
+                {'Authorization': f'Bearer {auth_token}'}
+                if auth_token
+                else None
+            ),
         )
 
         return response.json()
@@ -167,11 +171,17 @@ class PonikaClient:
             f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
+            headers=(
+                {'Authorization': f'Bearer {auth_token}'}
+                if auth_token
+                else None
+            ),
         )
 
         try:
-            response_obj = ApiResponse[data_model].model_validate(response.json())
+            response_obj = ApiResponse[data_model].model_validate(
+                response.json()
+            )
         except ValidationError as e:
             print(f'Error during request: POST {endpoint}')
             print(
@@ -199,7 +209,11 @@ class PonikaClient:
             f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
+            headers=(
+                {'Authorization': f'Bearer {auth_token}'}
+                if auth_token
+                else None
+            ),
         )
 
         return response
@@ -230,7 +244,8 @@ class PonikaClient:
                     files_params[key] = (filename, file_handle)
 
                 files_params = {
-                    key: open(filepath, 'rb') for key, filepath in files.items()
+                    key: open(filepath, 'rb')
+                    for key, filepath in files.items()
                 }
 
                 response = self._request.post(
@@ -286,13 +301,19 @@ class PonikaClient:
             f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
+            headers=(
+                {'Authorization': f'Bearer {auth_token}'}
+                if auth_token
+                else None
+            ),
         )
 
         try:
             response_json = response.json()
         except TypeError:
-            raise TeltonikaApiException(f'Cannot JSON decode response: {response.text}')
+            raise TeltonikaApiException(
+                f'Cannot JSON decode response: {response.text}'
+            )
 
         return ApiResponse[data_model].model_validate(response_json)
 
@@ -311,11 +332,17 @@ class PonikaClient:
             f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
+            headers=(
+                {'Authorization': f'Bearer {auth_token}'}
+                if auth_token
+                else None
+            ),
         )
 
         try:
-            response_obj = ApiResponse[data_model].model_validate(response.json())
+            response_obj = ApiResponse[data_model].model_validate(
+                response.json()
+            )
         except ValidationError as e:
             print(f'Error during request: DELETE {endpoint}')
             print(
@@ -334,7 +361,9 @@ class PonikaClient:
         expires: int
 
     @validate_call
-    def login(self, username: str, password: str) -> ApiResponse[LoginResponseData]:
+    def login(
+        self, username: str, password: str
+    ) -> ApiResponse[LoginResponseData]:
         """Login to the Ponika API and retrieve a token."""
         self._logger.info('Logging in with username: %s', username)
         response = self._post(

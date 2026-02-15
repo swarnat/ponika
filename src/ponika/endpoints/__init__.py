@@ -63,7 +63,9 @@ class StatusEndpoint(Generic[TStatusResponseModel]):
             else f'{self.status_endpoint_path}'
         )
         ResultType = (
-            self.status_response_model if item_id else List[self.status_response_model]
+            self.status_response_model
+            if item_id
+            else List[self.status_response_model]
         )
 
         response = self._client._get(endpoint)
@@ -202,7 +204,9 @@ class UpdateEndpoint(Generic[TItemUpdatePayload, TConfigResponse]):
         )
 
         response_model = ApiResponse[List[self.config_response_model]]
-        response_obj = response_model.model_validate(response.model_dump(mode='python'))
+        response_obj = response_model.model_validate(
+            response.model_dump(mode='python')
+        )
 
         if not response_obj.success or response_obj.data is None:
             raise TeltonikaApiException(response_obj.errors)
@@ -233,7 +237,11 @@ class ReadEndpoint(Generic[TConfigResponse]):
         self,
         item_id: str | int | None = None,
     ) -> List[TConfigResponse] | TConfigResponse:
-        endpoint = f'{self.endpoint_path}/{item_id}' if item_id else self.endpoint_path
+        endpoint = (
+            f'{self.endpoint_path}/{item_id}'
+            if item_id
+            else self.endpoint_path
+        )
 
         response_model = (
             ApiResponse[self.config_response_model]
@@ -256,6 +264,11 @@ class CRUDEndpoint(
     ReadEndpoint[TConfigResponse],
     UpdateEndpoint[TItemUpdatePayload, TConfigResponse],
     DeleteEndpoint[TDeleteResponse],
-    Generic[TItemCreatePayload, TConfigResponse, TItemUpdatePayload, TDeleteResponse],
+    Generic[
+        TItemCreatePayload,
+        TConfigResponse,
+        TItemUpdatePayload,
+        TDeleteResponse,
+    ],
 ):
     endpoint_path: str

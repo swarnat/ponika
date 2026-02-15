@@ -7,10 +7,10 @@ authors = [
     { name = "Ben Evans", email = "ben@bluechimp.io" },
     { name = "Stefan Warnat", email = "ich@stefanwarnat.de" },
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.12"
 dependencies = [
-    "pydantic>=2.11.5",
-    "requests>=2.32.3",
+    "pydantic==2.12.5",
+    "requests==2.32.3",
 ]
 
 [project.scripts]
@@ -22,7 +22,15 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
-    "pytest>=8.4.0",
-    "responses>=0.25.0",
-    "ruff>=0.11.13",
+    "pytest==9.0.2",
+    "responses==0.25.8",
+    "ruff==0.15.1",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+# E722 - Ignore bare except within tests
+"**/{tests,docs,tools}/*" = ["E722"]
+
+[tool.ruff.format]
+# 5. Use single quotes in `ruff format`.
+quote-style = "single"

@@ -272,3 +272,34 @@ class CRUDEndpoint(
     ],
 ):
     endpoint_path: str
+
+
+class DynamicPathCRUDEndpoint(
+    CRUDEndpoint[
+        TItemCreatePayload,
+        TConfigResponse,
+        TItemUpdatePayload,
+        TDeleteResponse,
+    ],
+    Generic[
+        TItemCreatePayload,
+        TConfigResponse,
+        TItemUpdatePayload,
+        TDeleteResponse,
+    ],
+):
+    """CRUDEndpoint variant that formats endpoint_path from runtime params."""
+
+    endpoint_path_template: str
+
+    def __init__(
+        self,
+        client: 'PonikaClient',
+        **path_params: str | int,
+    ) -> None:
+        super().__init__(client)
+        self._path_params = path_params
+
+    @property
+    def endpoint_path(self) -> str:  # type: ignore[override]
+        return self.endpoint_path_template.format(**self._path_params)

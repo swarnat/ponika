@@ -1,15 +1,21 @@
-from ponika.endpoints import CRUDEndpoint, CreateEndpoint, Endpoint, ReadEndpoint, StatusEndpoint, UpdateEndpoint
+from ponika.endpoints import (
+    CreateEndpoint,
+    Endpoint,
+    ReadEndpoint,
+    StatusEndpoint,
+    UpdateEndpoint,
+)
 from pydantic import ConfigDict, Field
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, List
 
-from ponika.endpoints.dhcp.enums import DHCPMode
 from ponika.exceptions import TeltonikaApiException
 from ponika.models import ApiResponse, BaseModel, BasePayload
 
-from ponika.endpoints.wireless.enums import WifiDeviceBand, WifiMode
+from ponika.endpoints.wireless.enums import WifiMode
 
 if TYPE_CHECKING:
-    from ponika import PonikaClient
+    pass
+
 
 class DhcpIpv6ServerBase:
     enable_dhcpv6: str | None = None
@@ -30,7 +36,7 @@ class DhcpIpv6ServerConfigResponse(BaseModel, DhcpIpv6ServerBase):
     interface: str | None = None
 
 
-class DhcpIpv6ServerCreatePayload(BasePayload, DhcpIpv6ServerBase): 
+class DhcpIpv6ServerCreatePayload(BasePayload, DhcpIpv6ServerBase):
     id: str
     interface: str | None = None
 
@@ -51,10 +57,10 @@ class DhcpIpv6ServersStatusResponse(BaseModel):
     interface: list[str] | str
     errors: list[Error] | None = None
 
-    
+
 class DynamicLease(BaseModel):
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    
+
     class Ipv6Prefix:
         address: str
         prefix_length: int
@@ -72,7 +78,7 @@ class IPv6ServerEndpoint(
     CreateEndpoint[DhcpIpv6ServerCreatePayload, DhcpIpv6ServerConfigResponse],
     ReadEndpoint[DhcpIpv6ServerConfigResponse],
     UpdateEndpoint[DhcpIpv6ServerUpdatePayload, DhcpIpv6ServerConfigResponse],
-    StatusEndpoint[DhcpIpv6ServersStatusResponse]
+    StatusEndpoint[DhcpIpv6ServersStatusResponse],
 ):
     endpoint_path = "/dhcp/servers/ipv4/config"
     status_endpoint_path = "/dhcp/servers/ipv4/status"
@@ -83,20 +89,18 @@ class IPv6ServerEndpoint(
     create_model = DhcpIpv6ServerCreatePayload
 
     status_response_model = DhcpIpv6ServersStatusResponse
-    
-    def get_dynamic_leases(
-        self
-    ) -> List[DynamicLease]:
+
+    def get_dynamic_leases(self) -> List[DynamicLease]:
         endpoint = "/dhcp/leases/ipv6/status"
 
         response = self._client._get(endpoint)
 
         response = ApiResponse[List[DynamicLease]].model_validate(response)
-        
+
         if not response.success:
             raise TeltonikaApiException(response.errors)
-        
+
         if response.data is not None:
             return response.data
-        
+
         return []

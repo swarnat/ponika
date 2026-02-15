@@ -45,4 +45,3 @@ class TailscaleEndpoint(
     config_response_model = TailscaleConfigResponse
     update_model = TailscaleConfigUpdatePayload
     status_response_model = TailscaleStatusResponse
-

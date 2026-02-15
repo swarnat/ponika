@@ -62,9 +62,7 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException(
-                "Missing data in backup status response"
-            )
+            raise TeltonikaApiException("Missing data in backup status response")
 
         return response.data
 
@@ -81,9 +79,7 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException(
-                "Missing data in backup generate response"
-            )
+            raise TeltonikaApiException("Missing data in backup generate response")
 
         return response.data
 
@@ -100,9 +96,7 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException(
-                "Missing data in backup apply response"
-            )
+            raise TeltonikaApiException("Missing data in backup apply response")
 
         return response.data
 
@@ -137,21 +131,23 @@ class BackupEndpoint(Endpoint):
         return response.data
 
     def download(self) -> bytes:
-        response = self._client._post_raw(
-            endpoint="/backup/actions/download"
-        )
+        response = self._client._post_raw(endpoint="/backup/actions/download")
 
         if response.status_code >= 400:
-            raise RuntimeError(f"Download failed: {response.status_code} {response.text}")
+            raise RuntimeError(
+                f"Download failed: {response.status_code} {response.text}"
+            )
 
         return response.content
-        
+
     def download_to_file(self, target: str | Path) -> bool:
         target = Path(target)
         response = self._client._post_raw(endpoint="/backup/actions/download")
 
         if response.status_code >= 400:
-            raise RuntimeError(f"Download failed: {response.status_code} {response.text}")
+            raise RuntimeError(
+                f"Download failed: {response.status_code} {response.text}"
+            )
 
         target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -172,9 +168,7 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException(
-                "Missing data in backup upload response"
-            )
+            raise TeltonikaApiException("Missing data in backup upload response")
 
         return response.data
 
@@ -187,9 +181,7 @@ class BackupEndpoint(Endpoint):
         if not response.success:
             raise TeltonikaApiException(response.errors)
         if response.data is None:
-            raise TeltonikaApiException(
-                "Missing data in backup delete response"
-            )
+            raise TeltonikaApiException("Missing data in backup delete response")
 
         return response.data
 

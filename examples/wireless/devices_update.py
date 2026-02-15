@@ -1,5 +1,4 @@
 from examples.config import connection
-from ponika.endpoints.wireless.interfaces import WirelessInterfaceUpdatePayload
 
 
 response = connection.wireless.devices.get_config("radio0")

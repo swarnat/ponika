@@ -7,9 +7,10 @@ from ponika.models import BaseModel, BasePayload
 from ponika.endpoints.wireless.enums import Encryption, Cipher, WifiMode
 
 if TYPE_CHECKING:
-    from ponika import PonikaClient
-class WirelessInterfaceBase:
+    pass
 
+
+class WirelessInterfaceBase:
     encryption: Encryption | str = Encryption.PSK2
     key: Optional[str] = None
     enabled: bool | str = True
@@ -71,18 +72,37 @@ class WirelessInterfaceBase:
     scan_time: Optional[str] = None
     auto_reconnect: Optional[str] = None
 
-class WirelessInterfaceConfigResponse(BaseModel, WirelessInterfaceBase): 
-    key_set: Optional[str] = Field(serialization_alias='key:set', exclude=True, default=None)
-    auth_secret_set: Optional[str] = Field(serialization_alias='auth_secret:set', exclude=True, default=None)
-    acct_secret_set: Optional[str] = Field(serialization_alias='acct_secret:set', exclude=True, default=None)
-    password_set: Optional[str] = Field(serialization_alias='password:set', exclude=True, default=None)
-    pkcs_passwd_set: Optional[str] = Field(serialization_alias='pkcs_passwd:set', exclude=True, default=None)
-    priv_key_pwd_set: Optional[str] = Field(serialization_alias='priv_key_pwd:set', exclude=True, default=None)
-    priv_key2_pwd_set: Optional[str] = Field(serialization_alias='priv_key2_pwd:set', exclude=True, default=None)
+
+class WirelessInterfaceConfigResponse(BaseModel, WirelessInterfaceBase):
+    key_set: Optional[str] = Field(
+        serialization_alias="key:set", exclude=True, default=None
+    )
+    auth_secret_set: Optional[str] = Field(
+        serialization_alias="auth_secret:set", exclude=True, default=None
+    )
+    acct_secret_set: Optional[str] = Field(
+        serialization_alias="acct_secret:set", exclude=True, default=None
+    )
+    password_set: Optional[str] = Field(
+        serialization_alias="password:set", exclude=True, default=None
+    )
+    pkcs_passwd_set: Optional[str] = Field(
+        serialization_alias="pkcs_passwd:set", exclude=True, default=None
+    )
+    priv_key_pwd_set: Optional[str] = Field(
+        serialization_alias="priv_key_pwd:set", exclude=True, default=None
+    )
+    priv_key2_pwd_set: Optional[str] = Field(
+        serialization_alias="priv_key2_pwd:set", exclude=True, default=None
+    )
+
 
 class WirelessInterfaceCreatePayload(BasePayload, WirelessInterfaceBase): ...
+
+
 class WirelessInterfaceUpdatePayload(BasePayload, WirelessInterfaceBase):
     id: int
+
 
 class WirelessInterfacesDeleteResponse(BaseModel):
     # deleted interface
@@ -94,6 +114,7 @@ class WirelessInterfacesStatusResponse(BaseModel):
 
     class Client(BaseModel):
         """Data model for wireless client information."""
+
         expires: Optional[int] = None
         band: str
         ipaddr: Optional[str] = None
@@ -108,7 +129,7 @@ class WirelessInterfacesStatusResponse(BaseModel):
     id: str
     wifi_id: str
     ifname: str
-    
+
     encryption: str
     # differs from docs says is required
     vht_supported: Optional[bool] = None
@@ -124,13 +145,18 @@ class WirelessInterfacesStatusResponse(BaseModel):
 
 
 class InterfacesEndpoint(
-    CRUDEndpoint[WirelessInterfaceCreatePayload, WirelessInterfaceConfigResponse, WirelessInterfaceUpdatePayload, WirelessInterfacesDeleteResponse],
-    StatusEndpoint[WirelessInterfacesStatusResponse]
+    CRUDEndpoint[
+        WirelessInterfaceCreatePayload,
+        WirelessInterfaceConfigResponse,
+        WirelessInterfaceUpdatePayload,
+        WirelessInterfacesDeleteResponse,
+    ],
+    StatusEndpoint[WirelessInterfacesStatusResponse],
 ):
     endpoint_path = "/wireless/interfaces/config"
     status_endpoint_path = "/wireless/interfaces/status"
 
-    config_response_model =  WirelessInterfaceConfigResponse
+    config_response_model = WirelessInterfaceConfigResponse
     create_modele_model = WirelessInterfaceCreatePayload
     update_model = WirelessInterfaceUpdatePayload
 

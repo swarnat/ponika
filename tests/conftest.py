@@ -8,6 +8,7 @@ from ponika import PonikaClient
 BASE_URL = "https://test-device:443/api"
 
 # Standard login response for mocked tests
+# fmt: off
 LOGIN_RESPONSE = {
     "success": True,
     "data": {
@@ -21,7 +22,7 @@ LOGIN_RESPONSE = {
 @pytest.fixture
 def mock_client():
     """Create a PonikaClient instance for testing with mocks.
-    
+
     This client uses a fake device URL and credentials. The actual
     HTTP requests will be mocked using the @responses.activate decorator.
     """
@@ -35,7 +36,7 @@ def mock_client():
 
 def mock_login():
     """Register the standard login mock response.
-    
+
     Must be called within a @responses.activate context.
     """
     responses.post(

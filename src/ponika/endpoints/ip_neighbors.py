@@ -41,7 +41,7 @@ class IpNeighborsEndpoint:
             return ApiResponse[List[self.Ipv4NeighborResponseDataItem]].model_validate(
                 self._client._get("/ip_neighbors/ipv4/status")
             )
-        
+
     class Ipv6NeighborsEndpoint:
         def __init__(self, client: "PonikaClient") -> None:
             self._client: "PonikaClient" = client

@@ -60,7 +60,7 @@ BACKUP_SUCCESS_DATA = {
     "success": True,
     "data": {
         "sha256": "411c0ef78f6007bf074a8c6bf6b063a4eb6f8b4a1c3edb7285c0e7356e904369",
-        "md5": "fc2a0ae495e6b9645152de5579476aa1"
+        "md5": "fc2a0ae495e6b9645152de5579476aa1",
     },
 }
 
@@ -74,6 +74,7 @@ def test_backup_get_status(mock_client):
 
     assert result.backup_exists is True
     assert result.default_exists is False
+    # fmt: off
     assert result.sha256 == "411c0ef78f6007bf074a8c6bf6b063a4eb6f8b4a1c3edb7285c0e7356e904369"
 
 
@@ -179,10 +180,7 @@ def test_backup_upload(mock_client, tmp_path):
     mock_client.backup.upload(str(backup_file))
 
     upload_call = responses.calls[1].request
-    assert (
-        upload_call.url
-        == "https://test-device:443/api/backup/actions/upload"
-    )
+    assert upload_call.url == "https://test-device:443/api/backup/actions/upload"
     assert "multipart/form-data" in upload_call.headers["Content-Type"]
 
 

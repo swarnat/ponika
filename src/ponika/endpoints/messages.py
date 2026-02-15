@@ -61,9 +61,7 @@ class MessagesEndpoint(Endpoint):
 
         return response.data
 
-    def send(
-        self, number: str, message: str, modem: str
-    ) -> SendMessageResponseData:
+    def send(self, number: str, message: str, modem: str) -> SendMessageResponseData:
         """Send a message to a recipient."""
         payload = SendMessagePayload(
             number=number,

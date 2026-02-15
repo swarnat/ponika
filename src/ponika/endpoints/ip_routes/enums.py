@@ -10,4 +10,3 @@ class RoutingType(str, Enum):
     PROHIBIT = "prohibit"
     BLACKHOLE = "blackhole"
     ANYCAST = "anycast"
-    

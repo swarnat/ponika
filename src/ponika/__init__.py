@@ -1,5 +1,4 @@
 from contextlib import ExitStack
-from dataclasses import asdict
 import os
 import urllib3
 
@@ -30,6 +29,7 @@ from ponika.models import T, ApiResponse, BasePayload, Token, BaseModel
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
 class ClientConfig(BaseModel):
     """Configuration for PonikaClient."""
 
@@ -47,7 +47,7 @@ class ClientConfig(BaseModel):
     @property
     def base_url(self) -> str:
         return (
-            f"{'https' if self.tls else 'http'}://{self.host}:{self.resolved_port}/api"
+            f'{"https" if self.tls else "http"}://{self.host}:{self.resolved_port}/api'
         )
 
 
@@ -119,15 +119,15 @@ class PonikaClient:
         params: Optional[Dict[str, Any]] = None,
         auth_required: bool = True,
     ) -> object:
-        self._logger.info("Making GET request to: %s", endpoint)
+        self._logger.info('Making GET request to: %s', endpoint)
 
         auth_token = self._get_auth_token() if auth_required else None
 
         response = self._request.get(
-            f"{self._config.base_url}{endpoint}",
+            f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             params=params,
-            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
         )
 
         return response.json()
@@ -139,11 +139,15 @@ class PonikaClient:
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
-        return self._post(endpoint=endpoint, data_model=data_model, params={"data":params}, auth_required=auth_required)
+        return self._post(
+            endpoint=endpoint,
+            data_model=data_model,
+            params={'data': params},
+            auth_required=auth_required,
+        )
 
     def _post(
         self,
@@ -152,7 +156,7 @@ class PonikaClient:
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-        self._logger.info("Making POST request to: %s", endpoint)
+        self._logger.info('Making POST request to: %s', endpoint)
 
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
@@ -160,31 +164,31 @@ class PonikaClient:
         auth_token = self._get_auth_token() if auth_required else None
 
         response = self._request.post(
-            f"{self._config.base_url}{endpoint}",
+            f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
         )
 
         try:
-            response_obj = ApiResponse[data_model].model_validate(
-                response.json()
-            )
+            response_obj = ApiResponse[data_model].model_validate(response.json())
         except ValidationError as e:
-            print(f"Error during request: POST {endpoint}")
-            print(f"Error during response validation to class ApiResponse[{data_model}]")
-            print(f"Response we got: {response.text}")
+            print(f'Error during request: POST {endpoint}')
+            print(
+                f'Error during response validation to class ApiResponse[{data_model}]'
+            )
+            print(f'Response we got: {response.text}')
             raise e
 
         return response_obj
-    
+
     def _post_raw(
         self,
         endpoint: str,
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> Response:
-        self._logger.info("Making POST request to: %s", endpoint)
+        self._logger.info('Making POST request to: %s', endpoint)
 
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
@@ -192,14 +196,14 @@ class PonikaClient:
         auth_token = self._get_auth_token() if auth_required else None
 
         response = self._request.post(
-            f"{self._config.base_url}{endpoint}",
+            f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
         )
 
         return response
-    
+
     def _post_files(
         self,
         endpoint: str,
@@ -208,19 +212,16 @@ class PonikaClient:
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-        self._logger.info("Making POST request to: %s", endpoint)
+        self._logger.info('Making POST request to: %s', endpoint)
 
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
         auth_token = self._get_auth_token() if auth_required else None
 
-        
-            
         files_params = {}
 
         try:
-
             with ExitStack() as stack:
                 for key, filepath in files.items():
                     filename = os.path.basename(filepath)
@@ -228,22 +229,28 @@ class PonikaClient:
 
                     files_params[key] = (filename, file_handle)
 
-                files_params = {key: open(filepath, 'rb') for key, filepath in files.items()}
+                files_params = {
+                    key: open(filepath, 'rb') for key, filepath in files.items()
+                }
 
                 response = self._request.post(
-                    f"{self._config.base_url}{endpoint}",
+                    f'{self._config.base_url}{endpoint}',
                     verify=self._config.verify_tls,
                     files=files_params,
                     data=params,
-                    headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+                    headers=(
+                        {'Authorization': f'Bearer {auth_token}'}
+                        if auth_token
+                        else None
+                    ),
                 )
         finally:
             # Dateien immer schließen
             for file_handle in files_params.values():
                 file_handle.close()
-                
+
         return ApiResponse[data_model].model_validate(response.json())
-    
+
     def _put_data(
         self,
         endpoint: str,
@@ -251,11 +258,15 @@ class PonikaClient:
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
 
-        return self._put(endpoint=endpoint, data_model=data_model, params={"data":params}, auth_required=auth_required)
+        return self._put(
+            endpoint=endpoint,
+            data_model=data_model,
+            params={'data': params},
+            auth_required=auth_required,
+        )
 
     def _put(
         self,
@@ -264,7 +275,7 @@ class PonikaClient:
         params: Optional[Dict[str, Any] | BasePayload] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-        self._logger.info("Making POST request to: %s", endpoint)
+        self._logger.info('Making POST request to: %s', endpoint)
 
         if isinstance(params, (BasePayload, BaseModel)):
             params = params.asdict()
@@ -272,19 +283,19 @@ class PonikaClient:
         auth_token = self._get_auth_token() if auth_required else None
 
         response = self._request.put(
-            f"{self._config.base_url}{endpoint}",
+            f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
         )
 
         try:
             response_json = response.json()
         except TypeError:
-            raise TeltonikaApiException(f"Cannot JSON decode response: {response.text}")
+            raise TeltonikaApiException(f'Cannot JSON decode response: {response.text}')
 
         return ApiResponse[data_model].model_validate(response_json)
-    
+
     def _delete(
         self,
         endpoint: str,
@@ -292,25 +303,25 @@ class PonikaClient:
         params: Optional[Dict[str, Any]] = None,
         auth_required: bool = True,
     ) -> ApiResponse[T]:
-        self._logger.info("Making POST request to: %s", endpoint)
+        self._logger.info('Making POST request to: %s', endpoint)
 
         auth_token = self._get_auth_token() if auth_required else None
 
         response = self._request.delete(
-            f"{self._config.base_url}{endpoint}",
+            f'{self._config.base_url}{endpoint}',
             verify=self._config.verify_tls,
             json=params,
-            headers=({"Authorization": f"Bearer {auth_token}"} if auth_token else None),
+            headers=({'Authorization': f'Bearer {auth_token}'} if auth_token else None),
         )
 
         try:
-            response_obj = ApiResponse[data_model].model_validate(
-                response.json()
-            )
+            response_obj = ApiResponse[data_model].model_validate(response.json())
         except ValidationError as e:
-            print(f"Error during request: DELETE {endpoint}")
-            print(f"Error during response validation to class ApiResponse[{data_model}]")
-            print(f"Response we got: {response.text}")
+            print(f'Error during request: DELETE {endpoint}')
+            print(
+                f'Error during response validation to class ApiResponse[{data_model}]'
+            )
+            print(f'Response we got: {response.text}')
             raise e
 
         return response_obj
@@ -325,11 +336,11 @@ class PonikaClient:
     @validate_call
     def login(self, username: str, password: str) -> ApiResponse[LoginResponseData]:
         """Login to the Ponika API and retrieve a token."""
-        self._logger.info("Logging in with username: %s", username)
+        self._logger.info('Logging in with username: %s', username)
         response = self._post(
-            "/login",
+            '/login',
             self.LoginResponseData,
-            {"username": username, "password": password},
+            {'username': username, 'password': password},
             auth_required=False,
         )
 
@@ -342,5 +353,5 @@ class PonikaClient:
 
     def logout(self) -> ApiResponse[LogoutResponseData]:
         """Logout from the Ponika API."""
-        self._logger.info("Logging out...")
-        return self._post("/logout", self.LogoutResponseData)
+        self._logger.info('Logging out...')
+        return self._post('/logout', self.LogoutResponseData)

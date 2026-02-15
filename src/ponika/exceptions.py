@@ -5,8 +5,8 @@ class TeltonikaApiException(Exception):
         self.errors = args
 
     def __str__(self):
-        return ", " . join([str(error) for error in self.errors])
-    
+        return ", ".join([str(error) for error in self.errors])
+
 
 class TeltonikaLoginException(TeltonikaApiException):
     def __init__(self, *args):
@@ -15,4 +15,4 @@ class TeltonikaLoginException(TeltonikaApiException):
         self.errors = ["The provided credentials are invalid."]
 
     def __str__(self):
-        return ", " . join([str(error) for error in self.errors])
+        return ", ".join([str(error) for error in self.errors])

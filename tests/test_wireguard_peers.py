@@ -65,9 +65,7 @@ def test_wireguard_peers_get_list(mock_client):
         WIREGUARD_PEERS_LIST_RESPONSE,
     )
 
-    result = mock_client.wireguard.peers.get_config(
-        WireguardPeerGetPayload(id="wg0")
-    )
+    result = mock_client.wireguard.peers.get_config(WireguardPeerGetPayload(id="wg0"))
 
     assert len(result) == 1
     assert result[0].id == "peer1"
@@ -230,6 +228,4 @@ def test_wireguard_peers_error_raises(mock_client):
     )
 
     with pytest.raises(TeltonikaApiException):
-        mock_client.wireguard.peers.get_config(
-            WireguardPeerGetPayload(id="wg0")
-        )
+        mock_client.wireguard.peers.get_config(WireguardPeerGetPayload(id="wg0"))

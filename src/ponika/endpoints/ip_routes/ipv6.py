@@ -43,8 +43,12 @@ class Ipv6RouteCreatePayload(BasePayload, Ipv6RouteBase):
 
 
 class Ipv6RouteEndpoint(
-    CRUDEndpoint[Ipv6RouteCreatePayload, Ipv6RouteConfigResponse,
-                 Ipv6RouteUpdatePayload, Ipv6RouteDeleteResponse],
+    CRUDEndpoint[
+        Ipv6RouteCreatePayload,
+        Ipv6RouteConfigResponse,
+        Ipv6RouteUpdatePayload,
+        Ipv6RouteDeleteResponse,
+    ],
 ):
     endpoint_path = "/ip_routes/ipv6/config"
     status_endpoint_path = "/ip_routes/ipv6/status"
@@ -54,5 +58,5 @@ class Ipv6RouteEndpoint(
     update_model = Ipv6RouteUpdatePayload
     create_model = Ipv6RouteCreatePayload
     delete_reponse_model = Ipv6RouteDeleteResponse
-    
+
     status_response_model = Ipv6RouteStatusResponse

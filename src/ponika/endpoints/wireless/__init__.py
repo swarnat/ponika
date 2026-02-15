@@ -11,4 +11,3 @@ class WirelessEndpoint:
         self._client: "PonikaClient" = client
         self.interfaces = InterfacesEndpoint(client)
         self.devices = DevicesEndpoint(client)
-

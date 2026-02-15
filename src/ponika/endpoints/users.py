@@ -1,10 +1,9 @@
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Optional, Type
+from typing import TYPE_CHECKING, Optional
 from ponika.endpoints import CRUDEndpoint
 from ponika.models import BaseModel, BasePayload
 
 if TYPE_CHECKING:
-    from ponika import PonikaClient
+    pass
 
 
 class UserDeleteResponse(BaseModel):
@@ -36,8 +35,9 @@ class UserUpdateDefinition(BasePayload):
 
 
 class UsersEndpoint(
-    CRUDEndpoint[UserDefinition, UserConfigResponse,
-                 UserUpdateDefinition, UserDeleteResponse]
+    CRUDEndpoint[
+        UserDefinition, UserConfigResponse, UserUpdateDefinition, UserDeleteResponse
+    ]
 ):
     endpoint_path = "/users/config"
 

@@ -1,5 +1,9 @@
-from ponika.endpoints import CRUDEndpoint, Endpoint, ReadEndpoint, StatusEndpoint, UpdateEndpoint
-from pydantic import Field
+from ponika.endpoints import (
+    Endpoint,
+    ReadEndpoint,
+    StatusEndpoint,
+    UpdateEndpoint,
+)
 from typing import TYPE_CHECKING, Optional
 
 from ponika.models import BaseModel, BasePayload
@@ -7,7 +11,8 @@ from ponika.models import BaseModel, BasePayload
 from ponika.endpoints.wireless.enums import WifiDeviceBand
 
 if TYPE_CHECKING:
-    from ponika import PonikaClient
+    pass
+
 
 class WirelessDeviceBase:
     enabled: bool | str = True
@@ -36,12 +41,13 @@ class WirelessDeviceUpdatePayload(BasePayload, WirelessDeviceBase):
 
 class WirelessDevicesStatusResponse(BaseModel):
     """Data model for wireless interfaces response."""
+
     class HardwareId(BaseModel):
         device_id: float
         subsystem_device_id: float
         vendor_id: float
         subsystem_vendor_id: float
-        
+
     id: str
     quality_max: float
     disabled: bool
@@ -69,7 +75,7 @@ class DevicesEndpoint(
     Endpoint,
     ReadEndpoint[WirelessDeviceConfigResponse],
     UpdateEndpoint[WirelessDeviceUpdatePayload, WirelessDeviceConfigResponse],
-    StatusEndpoint[WirelessDevicesStatusResponse]
+    StatusEndpoint[WirelessDevicesStatusResponse],
 ):
     endpoint_path = "/wireless/devices/config"
     status_endpoint_path = "/wireless/devices/status"

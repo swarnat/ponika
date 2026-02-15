@@ -12,5 +12,3 @@ class IPRouteEndpoint:
         self._client: "PonikaClient" = client
         self.routes_ipv4 = IPv4RouteEndpoint(client)
         self.routes_ipv6 = Ipv6RouteEndpoint(client)
-
-

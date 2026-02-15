@@ -8,6 +8,7 @@ from typing import Any, Dict, Callable
 BASE_URL = "https://test-device:443/api"
 
 # Standard responses
+# fmt: off
 LOGIN_RESPONSE = {
     "success": True,
     "data": {
@@ -17,6 +18,7 @@ LOGIN_RESPONSE = {
     }
 }
 
+# fmt: off
 LOGOUT_RESPONSE = {
     "success": True,
     "data": {
@@ -25,6 +27,7 @@ LOGOUT_RESPONSE = {
 }
 
 # Error responses
+# fmt: off
 ERROR_NOT_FOUND = {
     "success": False,
     "errors": [{
@@ -35,6 +38,7 @@ ERROR_NOT_FOUND = {
     }]
 }
 
+# fmt: off
 ERROR_UNAUTHORIZED = {
     "success": False,
     "errors": [{
@@ -47,6 +51,7 @@ ERROR_UNAUTHORIZED = {
 
 
 # Session mock responses
+# fmt: off
 SESSION_STATUS_RESPONSE = {
     "success": True,
     "data": {
@@ -206,7 +211,7 @@ SESSION_STATUS_RESPONSE = {
 
 def login_callback(request):
     """Callback for login endpoint that validates credentials.
-    
+
     Returns success if credentials are correct, error otherwise.
     """
 
@@ -222,16 +227,19 @@ def login_callback(request):
             # Invalid credentials
             error_response = {
                 "success": False,
-                "errors": [{
-                    "code": 401,
-                    "error": "Invalid credentials",
-                    "source": "auth",
-                    "section": None
-                }]
+                "errors": [
+                    {
+                        "code": 401,
+                        "error": "Invalid credentials",
+                        "source": "auth",
+                        "section": None,
+                    }
+                ],
             }
             return (200, {}, json.dumps(error_response))
     except Exception:
         # Malformed request
+        # fmt: off
         error_response = {
             "success": False,
             "errors": [{
@@ -246,7 +254,7 @@ def login_callback(request):
 
 def mock_login_with_validation():
     """Register login mock with credential validation.
-    
+
     Must be called within a @responses.activate context.
     """
     responses.add_callback(
@@ -263,10 +271,10 @@ def mock_endpoint(
     response_data: Dict[str, Any],
     status: int = 200,
     include_login: bool = True,
-    validate_login: bool = False
+    validate_login: bool = False,
 ) -> None:
     """Register a mocked endpoint response.
-    
+
     Args:
         method: HTTP method (get, post, put, delete)
         path: API path (e.g., '/tailscale/config')
@@ -274,7 +282,7 @@ def mock_endpoint(
         status: HTTP status code
         include_login: Whether to also mock the login endpoint
         validate_login: Whether to validate login credentials (requires correct username/password)
-        
+
     Must be called within a @responses.activate context.
     """
     if include_login:
@@ -286,7 +294,7 @@ def mock_endpoint(
                 json=LOGIN_RESPONSE,
                 status=200,
             )
-    
+
     getattr(responses, method.lower())(
         f"{BASE_URL}{path}",
         json=response_data,
@@ -299,19 +307,19 @@ def mock_endpoint_with_callback(
     path: str,
     callback: Callable,
     include_login: bool = True,
-    validate_login: bool = False
+    validate_login: bool = False,
 ) -> None:
     """Register a mocked endpoint with a callback function for validation.
-    
+
     Args:
         method: HTTP method (get, post, put, delete)
         path: API path (e.g., '/tailscale/config')
         callback: Callback function that receives request and returns (status, headers, body)
         include_login: Whether to also mock the login endpoint
         validate_login: Whether to validate login credentials
-        
+
     Must be called within a @responses.activate context.
-    
+
     Example callback:
         def my_callback(request):
             body = json.loads(request.body)
@@ -329,7 +337,7 @@ def mock_endpoint_with_callback(
                 json=LOGIN_RESPONSE,
                 status=200,
             )
-    
+
     responses.add_callback(
         getattr(responses, method.upper()),
         f"{BASE_URL}{path}",
@@ -345,10 +353,10 @@ def mock_error_response(
     error_message: str = "Not found",
     error_source: str = "endpoint",
     status: int = 200,
-    include_login: bool = True
+    include_login: bool = True,
 ) -> None:
     """Register a mocked error response.
-    
+
     Args:
         method: HTTP method (get, post, put, delete)
         path: API path (e.g., '/tailscale/config')
@@ -357,23 +365,25 @@ def mock_error_response(
         error_source: Error source
         status: HTTP status code
         include_login: Whether to also mock the login endpoint
-        
+
     Must be called within a @responses.activate context.
     """
     error_response = {
         "success": False,
-        "errors": [{
-            "code": error_code,
-            "error": error_message,
-            "source": error_source,
-            "section": None
-        }]
+        "errors": [
+            {
+                "code": error_code,
+                "error": error_message,
+                "source": error_source,
+                "section": None,
+            }
+        ],
     }
-    
+
     mock_endpoint(
         method=method,
         path=path,
         response_data=error_response,
         status=status,
-        include_login=include_login
+        include_login=include_login,
     )

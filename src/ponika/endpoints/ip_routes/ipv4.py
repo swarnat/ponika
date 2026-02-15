@@ -3,10 +3,11 @@ from typing import TYPE_CHECKING
 
 
 from ponika.endpoints.ip_routes.enums import RoutingType
-from ponika.models import  BaseModel, BasePayload
+from ponika.models import BaseModel, BasePayload
 
 if TYPE_CHECKING:
-    from ponika import PonikaClient
+    pass
+
 
 class Ipv4RouteBase:
     interface: str | None = None
@@ -47,8 +48,12 @@ class IPv4RouteDeleteResponse(BaseModel):
 
 
 class IPv4RouteEndpoint(
-    CRUDEndpoint[Ipv4RouteCreatePayload, Ipv4RouteConfigResponse,
-                 Ipv4RouteUpdatePayload, IPv4RouteDeleteResponse],
+    CRUDEndpoint[
+        Ipv4RouteCreatePayload,
+        Ipv4RouteConfigResponse,
+        Ipv4RouteUpdatePayload,
+        IPv4RouteDeleteResponse,
+    ],
 ):
     endpoint_path = "/ip_routes/ipv4/config"
     status_endpoint_path = "/ip_routes/ipv4/status"
@@ -58,5 +63,5 @@ class IPv4RouteEndpoint(
     update_model = Ipv4RouteUpdatePayload
     create_model = Ipv4RouteCreatePayload
     delete_reponse_model = IPv4RouteDeleteResponse
-    
+
     status_response_model = Ipv4RouteStatusResponse

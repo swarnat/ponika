@@ -11,4 +11,3 @@ class DHCPEndpoint:
         self._client: "PonikaClient" = client
         self.server_ipv4 = IPv4ServerEndpoint(client)
         self.server_ipv6 = IPv6ServerEndpoint(client)
-

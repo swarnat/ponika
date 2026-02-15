@@ -50,4 +50,3 @@ class ConfigEndpoint(
     allow_bulk_update = True
     bulk_update_strip_item_id = False
     allow_bulk_delete = True
-

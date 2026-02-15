@@ -1,5 +1,4 @@
 from examples.config import connection
-from ponika.endpoints.dhcp.enums import DHCPMode
 from ponika.endpoints.ip_routes.enums import RoutingType
 
 

@@ -25,6 +25,7 @@ from ponika.endpoints.tailscale import TailscaleEndpoint
 from ponika.endpoints.unauthorized import UnauthorizedEndpoint
 from ponika.endpoints.wireguard import WireguardEndpoint
 from ponika.endpoints.wireless import WirelessEndpoint
+from ponika.endpoints.zerotier import ZerotierEndpoint
 from ponika.models import T, ApiResponse, BasePayload, Token, BaseModel
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -82,6 +83,7 @@ class PonikaClient:
         self.tailscale = TailscaleEndpoint(self)
         self.wireguard = WireguardEndpoint(self)
         self.wireless = WirelessEndpoint(self)
+        self.zerotier = ZerotierEndpoint(self)
         self.internet_connection = InternetConnectionEndpoint(self)
         self.ip_routes = IPRouteEndpoint(self)
         self.ip_neighbors = IpNeighborsEndpoint(self)

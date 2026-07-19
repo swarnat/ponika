@@ -314,6 +314,7 @@ def test_config_as_code_typed_models_cover_configurable_endpoints():
     assert set(PonikaConfig.model_fields) == {
         'auto_reboot',
         'dhcp',
+        'interfaces',
         'ip_routes',
         'recipients',
         'sms_utilities',

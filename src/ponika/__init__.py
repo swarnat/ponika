@@ -17,6 +17,7 @@ from time import time
 from ponika.endpoints.dhcp import DHCPEndpoint
 from ponika.endpoints.gps import GpsEndpoint
 from ponika.endpoints.internet_connection import InternetConnectionEndpoint
+from ponika.endpoints.interfaces import InterfacesEndpoint
 from ponika.endpoints.ip_neighbors import IpNeighborsEndpoint
 from ponika.endpoints.ip_routes import IPRouteEndpoint
 from ponika.endpoints.messages import MessagesEndpoint
@@ -91,6 +92,7 @@ class PonikaClient:
         self.wireless = WirelessEndpoint(self)
         self.zerotier = ZerotierEndpoint(self)
         self.internet_connection = InternetConnectionEndpoint(self)
+        self.interfaces = InterfacesEndpoint(self)
         self.ip_routes = IPRouteEndpoint(self)
         self.ip_neighbors = IpNeighborsEndpoint(self)
         self.modems = ModemsEndpoint(self)

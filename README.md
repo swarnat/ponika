@@ -21,6 +21,7 @@ The compatibility is tested with RUT devices.
 | Firmware  | Upgrade | ✅ |
 | GPS |  | ✅ |
 | Internet Connection |  | ✅ |
+| Interfaces |  | ✅ |
 | IP Neightbors | IPv4 | ✅ |
 | IP Neightbors | IPv6 | ✅ |
 | IP Routes  | IPv4 Routes | ✅ |

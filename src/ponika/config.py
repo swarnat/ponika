@@ -12,6 +12,7 @@ from ponika.endpoints.dhcp.static_leases_ipv4 import (
 from ponika.endpoints.dhcp.static_leases_ipv6 import (
     StaticLeaseIpv6CreatePayload,
 )
+from ponika.endpoints.interfaces.interfaces import InterfaceCreatePayload
 from ponika.endpoints.ip_routes.ipv4 import Ipv4RouteCreatePayload
 from ponika.endpoints.ip_routes.ipv6 import Ipv6RouteCreatePayload
 from ponika.endpoints.recipients.email_users import EmailUserCreatePayload
@@ -86,6 +87,7 @@ class ZerotierConfig(BaseModel):
 class PonikaConfig(BaseModel):
     auto_reboot: AutoRebootConfig | None = None
     dhcp: DhcpConfig | None = None
+    interfaces: list[InterfaceCreatePayload] | None = None
     ip_routes: IpRoutesConfig | None = None
     recipients: RecipientsConfig | None = None
     sms_utilities: SmsUtilitiesConfig | None = None

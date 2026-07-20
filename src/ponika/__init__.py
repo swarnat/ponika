@@ -22,6 +22,7 @@ from ponika.endpoints.ip_neighbors import IpNeighborsEndpoint
 from ponika.endpoints.ip_routes import IPRouteEndpoint
 from ponika.endpoints.messages import MessagesEndpoint
 from ponika.endpoints.modems import ModemsEndpoint
+from ponika.endpoints.openvpn import OpenvpnEndpoint
 from ponika.endpoints.recipients import RecipientsEndpoint
 from ponika.endpoints.session import SessionEndpoint
 from ponika.endpoints.sms_utilities import SmsUtilitiesEndpoint
@@ -100,6 +101,7 @@ class PonikaClient:
         self.users = UsersEndpoint(self)
         self.data_usage = DataUsageEndpoint(self)
         self.recipients = RecipientsEndpoint(self)
+        self.openvpn = OpenvpnEndpoint(self)
         self.config = ConfigApplier(self)
 
     def _get_auth_token(self) -> Optional[str]:

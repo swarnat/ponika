@@ -29,7 +29,9 @@ The compatibility is tested with RUT devices.
 | Modem |  | 🟡 |
 | MQTT | Broker  | ❌ |
 | MQTT | Publisher  | ❌ |
-| OpenVPN |  | ⭕ |
+| OpenVPN | Client | ✅ |
+| OpenVPN | Server | ⚠️ |
+| OpenVPN | TLS CLients | ⚠️ |
 | Recipient Groups |  | ✅ |
 | SMS | Send | ✅ |
 | SMS | Read/Delete | ✅ |

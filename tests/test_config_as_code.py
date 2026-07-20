@@ -11,6 +11,7 @@ from ponika.config import (
     ConfigApplier,
     DhcpConfig,
     IpRoutesConfig,
+    OpenvpnConfig,
     PonikaConfig,
     RecipientsConfig,
     SmsUtilitiesConfig,
@@ -316,6 +317,7 @@ def test_config_as_code_typed_models_cover_configurable_endpoints():
         'dhcp',
         'interfaces',
         'ip_routes',
+        'openvpn',
         'recipients',
         'sms_utilities',
         'wireguard',
@@ -328,6 +330,7 @@ def test_config_as_code_typed_models_cover_configurable_endpoints():
         'static_leases_ipv6',
     }
     assert set(IpRoutesConfig.model_fields) == {'routes_ipv4', 'routes_ipv6'}
+    assert set(OpenvpnConfig.model_fields) == {'config', 'tls_clients'}
     assert set(RecipientsConfig.model_fields) == {
         'phone_groups',
         'email_users',

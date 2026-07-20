@@ -50,3 +50,14 @@ class UsersEndpoint(
     config_response_model = UserConfigResponse
     delete_reponse_model = UserDeleteResponse
     config_match_fields = ('id', 'username')
+
+    def config_to_update_payload(self, payload: UserConfigResponse):
+        update_definition = UserUpdateDefinition(
+            **payload.model_dump(mode='python')
+        )
+
+        if payload.username == 'admin':
+            # Admin Groups are not allowed to update
+            update_definition.group = None
+
+        return update_definition

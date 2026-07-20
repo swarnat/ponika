@@ -15,6 +15,10 @@ from ponika.endpoints.dhcp.static_leases_ipv6 import (
 from ponika.endpoints.interfaces.interfaces import InterfaceCreatePayload
 from ponika.endpoints.ip_routes.ipv4 import Ipv4RouteCreatePayload
 from ponika.endpoints.ip_routes.ipv6 import Ipv6RouteCreatePayload
+from ponika.endpoints.openvpn.config import OpenvpnConfigCreatePayload
+from ponika.endpoints.openvpn.tls_clients import (
+    OpenvpnTlsClientCreatePayload,
+)
 from ponika.endpoints.recipients.email_users import EmailUserCreatePayload
 from ponika.endpoints.recipients.phone_groups import PhoneGroupCreatePayload
 from ponika.endpoints.sms_utilities.rules import SmsRuleCreatePayload
@@ -84,11 +88,22 @@ class ZerotierConfig(BaseModel):
     networks: list[ZerotierNetworksConfig] | None = None
 
 
+class OpenvpnTlsClientsConfig(BaseModel):
+    openvpn_id: str | int
+    items: list[OpenvpnTlsClientCreatePayload]
+
+
+class OpenvpnConfig(BaseModel):
+    config: list[OpenvpnConfigCreatePayload] | None = None
+    tls_clients: list[OpenvpnTlsClientsConfig] | None = None
+
+
 class PonikaConfig(BaseModel):
     auto_reboot: AutoRebootConfig | None = None
     dhcp: DhcpConfig | None = None
     interfaces: list[InterfaceCreatePayload] | None = None
     ip_routes: IpRoutesConfig | None = None
+    openvpn: OpenvpnConfig | None = None
     recipients: RecipientsConfig | None = None
     sms_utilities: SmsUtilitiesConfig | None = None
     # We do not provide users module within ConfigState method

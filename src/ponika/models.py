@@ -37,13 +37,21 @@ class TeltonikaApiError(BaseModel):
 
     code: int
     error: str
-    source: str | int
+    # Some RutOS endpoints omit source even though the OpenAPI schema marks it
+    # as required. Keep error responses parseable so callers receive the
+    # original device error instead of a Pydantic ValidationError.
+    source: str | int | None = None
     section: Optional[str] = None
+    value: Optional[str] = None
 
     def __str__(self) -> str:
-        return (
-            f'Error {self.code}: {self.error} ({self.source}, {self.section})'
+        context = ', '.join(
+            str(value)
+            for value in (self.source, self.section, self.value)
+            if value is not None
         )
+        suffix = f' ({context})' if context else ''
+        return f'Error {self.code}: {self.error}{suffix}'
 
 
 class ApiResponse(BaseModel, Generic[T]):

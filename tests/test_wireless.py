@@ -2,7 +2,12 @@
 
 import pytest
 import responses
+from pydantic import ValidationError
 
+from ponika.endpoints.wireless.actions import (
+    WirelessJoinPayload,
+    WirelessScanPayload,
+)
 from ponika.endpoints.wireless.devices import WirelessDeviceUpdatePayload
 from ponika.endpoints.wireless.interfaces import (
     WirelessInterfaceCreatePayload,
@@ -87,6 +92,33 @@ WIRELESS_INTERFACES_STATUS_RESPONSE = {
             'mode': 'Master',
             'multiple': False,
             'ssid': 'TestWiFi',
+        }
+    ],
+}
+
+WIRELESS_SCAN_RESPONSE = {
+    'success': True,
+    'data': [
+        {
+            'quality_max': 70,
+            'ssid': 'Example WiFi',
+            'encryption': {
+                'enabled': True,
+                'wpa': [2],
+                'ciphers': ['ccmp'],
+                'authentication': ['psk'],
+            },
+            'bssid': '00:11:22:33:44:55',
+            'encryption_description': 'WPA2 PSK (CCMP)',
+            'channel': 11,
+            'ht_operation': {
+                'secondary_channel_offset': 'no secondary',
+                'channel_width': 20,
+                'primary_channel': 11,
+            },
+            'mode': 'Master',
+            'quality': 60,
+            'signal': -50,
         }
     ],
 }
@@ -231,3 +263,72 @@ def test_wireless_devices_error_raises(mock_client):
 
     with pytest.raises(TeltonikaApiException):
         mock_client.wireless.devices.get_config()
+
+
+@pytest.mark.unit
+@responses.activate
+def test_wireless_actions_scan(mock_client):
+    mock_endpoint('post', '/wireless/actions/scan', WIRELESS_SCAN_RESPONSE)
+
+    result = mock_client.wireless.actions.scan(
+        WirelessScanPayload(device='radio0')
+    )
+
+    assert len(result) == 1
+    assert result[0].ssid == 'Example WiFi'
+    assert result[0].encryption is not None
+    assert result[0].encryption.enabled is True
+    assert (
+        responses.calls[-1].request.body == b'{"data": {"device": "radio0"}}'
+    )
+
+
+@pytest.mark.unit
+@responses.activate
+def test_wireless_actions_join(mock_client):
+    join_response = {
+        'success': True,
+        'data': WIRELESS_INTERFACES_LIST_RESPONSE['data'][0],
+    }
+    mock_endpoint('post', '/wireless/actions/join', join_response)
+
+    result = mock_client.wireless.actions.join(
+        WirelessJoinPayload(
+            device='radio0',
+            ssid='Example WiFi',
+            password='secret-password',
+        )
+    )
+
+    assert result.id == '1'
+    assert result.ssid == 'TestWiFi'
+    assert responses.calls[-1].request.body == (
+        b'{"data": {"device": "radio0", "ssid": "Example WiFi", '
+        b'"password": "secret-password"}}'
+    )
+
+
+def test_wireless_join_requires_ssid_or_bssid():
+    with pytest.raises(ValidationError, match='either bssid or ssid'):
+        WirelessJoinPayload(device='radio0')
+
+
+@pytest.mark.unit
+@responses.activate
+@pytest.mark.parametrize('action', ['scan', 'join'])
+def test_wireless_actions_error_raises(mock_client, action):
+    mock_error_response(
+        'post',
+        f'/wireless/actions/{action}',
+        error_code=422,
+        error_message=f'Failed to {action}',
+        error_source='wireless',
+    )
+
+    with pytest.raises(TeltonikaApiException):
+        if action == 'scan':
+            mock_client.wireless.actions.scan(WirelessScanPayload())
+        else:
+            mock_client.wireless.actions.join(
+                WirelessJoinPayload(device='radio0', ssid='Example WiFi')
+            )

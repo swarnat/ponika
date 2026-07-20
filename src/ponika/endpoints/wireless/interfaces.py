@@ -74,6 +74,7 @@ class WirelessInterfaceBase:
 
 
 class WirelessInterfaceConfigResponse(BaseModel, WirelessInterfaceBase):
+    id: Optional[str] = None
     key_set: Optional[str] = Field(
         serialization_alias='key:set', exclude=True, default=None
     )

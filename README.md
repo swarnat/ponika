@@ -45,6 +45,7 @@ The compatibility is tested with RUT devices.
 | Tailscale |  | ⚠️ |
 | Usermanagement  | - | ✅ |
 | Wireguard |  | ✅ |
+| Wireless  | Client | ✅ |
 | Wireless  | Devices | ✅ |
 | Wireless  | Interfaces | ✅ |
 | Zerotier |  | ✅ |

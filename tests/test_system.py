@@ -52,7 +52,24 @@ def test_system_actions(mock_client):
 def test_change_password_rejects_mismatch():
     with pytest.raises(ValidationError, match='must match'):
         ChangePasswordFirstLoginPayload(
-            password='first', password_confirm='second'
+            password='SecurePassword1', password_confirm='OtherPassword1'
+        )
+
+
+@pytest.mark.parametrize(
+    ('password', 'message'),
+    [
+        ('Short1', 'at least 8 characters'),
+        ('PASSWORD1', 'lowercase character'),
+        ('password1', 'uppercase character'),
+        ('Password', 'number'),
+    ],
+)
+def test_change_password_rejects_insufficient_complexity(password, message):
+    with pytest.raises(ValidationError, match=message):
+        ChangePasswordFirstLoginPayload(
+            password=password,
+            password_confirm=password,
         )
 
 

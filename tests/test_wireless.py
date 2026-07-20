@@ -116,6 +116,11 @@ WIRELESS_SCAN_RESPONSE = {
                 'channel_width': 20,
                 'primary_channel': 11,
             },
+            'vht_operation': {
+                'center_freq_1': 7,
+                'center_freq_2': 0,
+                'channel_width': 40,
+            },
             'mode': 'Master',
             'quality': 60,
             'signal': -50,
@@ -278,6 +283,9 @@ def test_wireless_actions_scan(mock_client):
     assert result[0].ssid == 'Example WiFi'
     assert result[0].encryption is not None
     assert result[0].encryption.enabled is True
+    assert result[0].vht_operation is not None
+    assert result[0].vht_operation.primary_channel is None
+    assert result[0].vht_operation.channel_width == 40
     assert (
         responses.calls[-1].request.body == b'{"data": {"device": "radio0"}}'
     )

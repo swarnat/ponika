@@ -43,7 +43,8 @@ class WirelessScanHtOperation(BaseModel):
 class WirelessScanVhtOperation(BaseModel):
     center_freq_1: int | float
     center_freq_2: int | float
-    primary_channel: int | float
+    primary_channel: Optional[int | float] = None
+    channel_width: Optional[int | float] = None
 
 
 class WirelessScanResponse(BaseModel):

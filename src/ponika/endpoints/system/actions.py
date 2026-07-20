@@ -1,4 +1,4 @@
-from pydantic import model_validator
+from pydantic import field_validator, model_validator
 
 from ponika.endpoints import Endpoint
 from ponika.exceptions import TeltonikaApiException
@@ -8,6 +8,19 @@ from ponika.models import BaseModel, BasePayload
 class ChangePasswordFirstLoginPayload(BasePayload):
     password: str
     password_confirm: str
+
+    @field_validator('password', 'password_confirm')
+    @classmethod
+    def validate_password_complexity(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError('password must contain at least 8 characters')
+        if not any(character.islower() for character in value):
+            raise ValueError('password must contain a lowercase character')
+        if not any(character.isupper() for character in value):
+            raise ValueError('password must contain an uppercase character')
+        if not any(character.isdigit() for character in value):
+            raise ValueError('password must contain a number')
+        return value
 
     @model_validator(mode='after')
     def passwords_match(self):

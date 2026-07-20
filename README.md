@@ -14,6 +14,7 @@ The compatibility is tested with RUT devices.
 | Data Usages  | SIM Card | ✅ |
 | Data Usages  | Modem | ⭕ |
 | Data Usages  | eSIM | ❌ |
+| Diagnostics  |  | ✅ |
 | DHCP  | DHCP Server IPv4 | ✅ |
 | DHCP  | Static Leases IPv4 | ✅ |
 | DHCP  | DHCP Server IPv6 | ✅ |

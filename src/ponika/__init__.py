@@ -8,6 +8,7 @@ from logging import Logger, getLogger
 from ponika.endpoints.auto_reboot import AutoRebootEndpoint
 from ponika.endpoints.backup import BackupEndpoint
 from ponika.endpoints.data_usage import DataUsageEndpoint
+from ponika.endpoints.diagnostics import DiagnosticsEndpoint
 from ponika.endpoints.firmware import FirmwareEndpoint
 from ponika.endpoints.users import UsersEndpoint
 from ponika.exceptions import TeltonikaApiException, TeltonikaLoginException
@@ -88,6 +89,7 @@ class PonikaClient:
         self.gps = GpsEndpoint(self)
         self.backup = BackupEndpoint(self)
         self.auto_reboot = AutoRebootEndpoint(self)
+        self.diagnostics = DiagnosticsEndpoint(self)
         self.dhcp = DHCPEndpoint(self)
         self.tailscale = TailscaleEndpoint(self)
         self.wireguard = WireguardEndpoint(self)

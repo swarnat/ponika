@@ -36,6 +36,12 @@ The compatibility is tested with RUT devices.
 | SMS | Send | ✅ |
 | SMS | Read/Delete | ✅ |
 | SMS | Command Setup | ✅ |
+| System | Actions | ⚠️ |
+| System | Banner | ⚠️ |
+| System | Buttons | ✅ |
+| System | Device | ✅ |
+| System | General | ✅ |
+| System | LED | ⚠️ |
 | Tailscale |  | ⚠️ |
 | Usermanagement  | - | ✅ |
 | Wireguard |  | ✅ |
@@ -48,6 +54,13 @@ The compatibility is tested with RUT devices.
 🟡 - Partially implemented  
 ⭕ - Will be implemented   
 ❌ - Will not implemented at the moment (missing hardware or test case)
+
+## Tested Devices
+
+- RUT240 v7.6
+- RUT241 v7.24
+- RUT955
+
 ## Installation
 
 You can install Ponika using pip:

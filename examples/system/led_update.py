@@ -1,0 +1,4 @@
+from examples.config import connection
+from ponika.endpoints.system.led import LedUpdatePayload
+
+print(connection.system.led.update(LedUpdatePayload(id='all', enabled=False)))

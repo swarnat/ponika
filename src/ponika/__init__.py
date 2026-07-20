@@ -26,6 +26,7 @@ from ponika.endpoints.openvpn import OpenvpnEndpoint
 from ponika.endpoints.recipients import RecipientsEndpoint
 from ponika.endpoints.session import SessionEndpoint
 from ponika.endpoints.sms_utilities import SmsUtilitiesEndpoint
+from ponika.endpoints.system import SystemEndpoint
 from ponika.endpoints.tailscale import TailscaleEndpoint
 from ponika.endpoints.unauthorized import UnauthorizedEndpoint
 from ponika.endpoints.wireguard import WireguardEndpoint
@@ -102,6 +103,7 @@ class PonikaClient:
         self.data_usage = DataUsageEndpoint(self)
         self.recipients = RecipientsEndpoint(self)
         self.openvpn = OpenvpnEndpoint(self)
+        self.system = SystemEndpoint(self)
         self.config = ConfigApplier(self)
 
     def _get_auth_token(self) -> Optional[str]:

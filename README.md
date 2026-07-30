@@ -27,7 +27,7 @@ The compatibility is tested with RUT devices.
 | IP Neightbors | IPv6 | ✅ |
 | IP Routes  | IPv4 Routes | ✅ |
 | IP Routes  | IPv6 Routes | ✅ |
-| Modem |  | 🟡 |
+| Modem |  | ⚠️ |
 | MQTT | Broker  | ❌ |
 | MQTT | Publisher  | ❌ |
 | OpenVPN | Client | ✅ |

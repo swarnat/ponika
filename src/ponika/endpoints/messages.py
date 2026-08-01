@@ -1,5 +1,7 @@
 from datetime import datetime
-from typing import TYPE_CHECKING, List
+from typing import TYPE_CHECKING, ClassVar, List
+
+from pydantic import field_validator
 
 from ponika.endpoints import Endpoint
 from ponika.exceptions import TeltonikaApiException
@@ -12,12 +14,26 @@ if TYPE_CHECKING:
 class MessagesStatusResponseItem(BaseModel):
     """Data model for a single message status item."""
 
+    DEVICE_DATE_FORMAT: ClassVar[str] = '%a %b %d %H:%M:%S %Y'
+
     message: str
     sender: str
     id: str
     modem_id: str
     status: str
     date: datetime
+
+    @field_validator('date', mode='before')
+    @classmethod
+    def parse_device_date(cls, value: object) -> object:
+        """Parse the non-ISO timestamp returned by message status."""
+        if isinstance(value, str):
+            try:
+                return datetime.strptime(value, cls.DEVICE_DATE_FORMAT)
+            except ValueError:
+                pass
+
+        return value
 
 
 class SendMessagePayload(BasePayload):

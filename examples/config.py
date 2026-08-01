@@ -2,9 +2,9 @@ from ponika import PonikaClient
 
 
 connection = PonikaClient(
-    host='192.168.1.1',
+    host='10.72.1.97',
     username='admin',
-    password='admin01',
+    password='svyJ4bj1L=36R8%$',
     # Optional, default is True, but often there no valid certificate
     verify_tls=False,
 )

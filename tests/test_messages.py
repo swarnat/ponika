@@ -1,6 +1,7 @@
 """Unit tests for message endpoints."""
 
 import json
+from datetime import datetime
 
 import pytest
 import responses
@@ -58,6 +59,25 @@ def test_messages_read(mock_client):
     assert result[0].id == '1001'
     assert result[0].sender == '+49170123456'
     assert result[0].status == 'received'
+
+
+@pytest.mark.unit
+@responses.activate
+def test_messages_read_parses_device_date_format(mock_client):
+    response = {
+        **MESSAGES_STATUS_RESPONSE,
+        'data': [
+            {
+                **MESSAGES_STATUS_RESPONSE['data'][0],
+                'date': 'Fri Nov 18 11:30:58 2022',
+            }
+        ],
+    }
+    mock_endpoint('get', '/messages/status', response)
+
+    result = mock_client.messages.read()
+
+    assert result[0].date == datetime(2022, 11, 18, 11, 30, 58)
 
 
 @pytest.mark.unit

@@ -22,8 +22,8 @@ class ManufacturingInfo(BaseModel):
 
 class DevicePort(BaseModel):
     name: str | None = None
-    position: str | None = None
-    num: str | None = None
+    position: int | str | None = None
+    num: int | str | None = None
     mac: str | None = None
 
 

@@ -196,6 +196,14 @@ def test_system_device_status_operations(mock_client):
     responses_by_path = {
         '/system/device/status': {
             'mnfinfo': {'name': 'RUTX11', 'macEth': '001E424F9563'},
+            'ports': [
+                {
+                    'mac': '20:97:27:85:08:C8',
+                    'num': 0,
+                    'name': 'LAN',
+                    'position': 1,
+                }
+            ],
             'static': {'fw_version': '7.19.2', 'cpu_count': 4},
             'features': {'ipv6': True},
             'board': {
@@ -241,6 +249,8 @@ def test_system_device_status_operations(mock_client):
     parameters = mock_client.system.device.get_parameters_status()
 
     assert status.static.fw_version == '7.19.2'
+    assert status.ports[0].num == 0
+    assert status.ports[0].position == 1
     assert status.board.hwinfo.two_5_gigabit_port is False
     assert usage.memory.ram_total == 256
     assert load[0][1] == 10
